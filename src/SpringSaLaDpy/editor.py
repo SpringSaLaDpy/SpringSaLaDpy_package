@@ -64,8 +64,9 @@ def edit_input_file(search_directory, output_path='', counts=[], on_rate=[], off
     
     #os.makedirs(output_path, exist_ok=True)
 
-    if output_path=='':
-        output_path=path
+    if output_path=='' or os.path.exists(output_path):
+        if output_path=='':
+            output_path=path
         ans = input(f'Warning, {path} is about to be overwritten, are you sure you want to continue? (Y/N)')
         if ans.upper() == 'Y':
             with open(output_path, 'w+', encoding='utf-8') as file:
