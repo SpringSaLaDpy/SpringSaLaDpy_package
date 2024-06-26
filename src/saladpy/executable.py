@@ -20,15 +20,16 @@ def simulate(model, runs=1):
         executable_name = 'langevin-ubuntu-latest'
         executable_extension = ''
 
-    with pkg_resources.path('SpringSaLaDpy', executable_name) as executable_path:
+    with pkg_resources.path('saladpy', executable_name) as executable_path:
         executable_path = f"{executable_path}{executable_extension}"
         model_path = os.path.abspath(model)
         print(f'Model "{model}" is running') 
         raw_s = r'{}'.format(model_path)
         for i in range(runs):
             subprocess.run([executable_path, 'simulate', raw_s, str(i)])
-        with open(model_path) as file:
-            file.write(f'Runs: {runs}')
+        output_model_path = os.path.join(model_path[:-4] + '_FOLDER', os.path.split(model_path)[1])
+        with open(output_model_path, mode='a') as file:
+            file.write(f'Runs: {str(runs)}')
         print(f'Simulation complete, results can be found here: {model_path[:-4]}_FOLDER')
 
 #simulate(r'C:\Users\cpero\Downloads\test_output\Simulation0_SIM.txt')

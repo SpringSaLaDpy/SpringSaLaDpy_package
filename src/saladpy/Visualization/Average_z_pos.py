@@ -252,7 +252,8 @@ def plot(directory_path, indicies=[], verbose=False, legend_right=True, list_opt
                         else:
                             legend_entry = legend_entry + f'{site[1]}, ' 
                     display_colors.append(legend_entry[:-2])
-        color_info(display_colors)
+        if list_options:
+            color_info(display_colors)
 
     avg_z_values = [[float(time) for time in times]]
     std_z_values = [[float(time) for time in times]]
