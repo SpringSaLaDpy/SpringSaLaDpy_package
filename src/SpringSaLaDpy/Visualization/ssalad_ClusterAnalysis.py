@@ -160,8 +160,8 @@ class ReadInputFile:
         return txtfile
     
     def getInpath(self):
-        mypath = self.txtfile.split("/")[:-1]
-        return "/".join(mypath)
+        mypath = os.path.split(self.txtfile)[0]
+        return os.path.join(mypath)
     
     def getOutpath(self, statName):
         # statName : Name of the analysis; cluster_stat, e2e_stat etc
@@ -248,6 +248,9 @@ class ClusterAnalysis:
         self.withMonomer = withMonomer
         
         timepoints = np.arange(0, self.t_total+self.dt, self.dt)
+        if timepoints[-1] > self.t_total:
+            print(f'removed: {timepoints[-1]}, max is {self.t_total}')
+            timepoints = timepoints[:-1]
         self.timePoints = timepoints
         
         numRuns = self.simfileObj.getNumRuns()

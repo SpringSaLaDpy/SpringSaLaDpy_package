@@ -1,28 +1,34 @@
-from molclustpy import *
-from SpringSaLaDpy.data_locator import *
+from .ssalad_ClusterAnalysis import *
 from .Molclustpy_visualization_funcitons import *
-import pandas as pd
-from SpringSaLaDpy.input_file_extraction import *
+from SpringSaLaDpy.input_file_extraction import read_input_file
 from SpringSaLaDpy.time_rounder import find_nearest_time
+from SpringSaLaDpy.data_locator import *
 
-def plot(search_directory, bins=[], time=None):
+def plot(search_directory, times, bins=[]):
+    
+    if os.path.split(search_directory)[1][-7:] == '_FOLDER':
+        plotting_path = search_directory
+    else:
+        plotting_path = os.path.join(search_directory, os.path.split(search_directory)[1][:-12] + '_FOLDER')
 
-    path_list = ['data', 'Cluster_stat', 'Histograms', 'Size_Freq_Fotm', 'MEAN_Run']
+    input_file = find_txt_file(plotting_path)
 
     #Round to nearest available time based on dt_data value
-    _, split_file = read_input_file(search_directory)
+    _, split_file = read_input_file(plotting_path)
     dt_data = float(split_file[0][4][9:])
+    total_time = float(split_file[0][1][12:])
 
-    search_term = 'Size_Freq_Fotm'
+    rounded_times = []
+    for time in times:
+        rounded_time = float(find_nearest_time(search_directory, ['data', 'Run0'], time, dt_data, 'Clusters_Time')[0])
+        if rounded_time <= total_time and not rounded_time < 0:
+            rounded_times.append(rounded_time)
 
-    time, fotm_file = find_nearest_time(search_directory, path_list, time, dt_data, search_term)
-    
-    outpath = os.path.normpath(fotm_file)
-    outpath = os.path.join(*outpath.split(os.sep)[:-5])
+    if times == []:
+        rounded_times.append(total_time)
 
-    df = pd.read_csv(fotm_file) 
-    New_columns = ['Cluster size','frequency','foTM']
-    df.columns = New_columns
-    df.to_csv(os.path.join(outpath,'pyStat','SteadyState_distribution.csv'), index=False)
+    ca = ClusterAnalysis(input_file)
+    ca.getMeanTrajectory(SingleTraj=False)
+    ca.getSteadyStateDistribution(SS_timePoints=rounded_times)
 
-    plotClusterDistCopy(outpath, time, bins)
+    plotClusterDistCopy(plotting_path, rounded_times, bins)

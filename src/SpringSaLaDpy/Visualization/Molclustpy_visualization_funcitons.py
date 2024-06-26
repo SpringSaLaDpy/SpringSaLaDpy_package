@@ -4,19 +4,26 @@ import matplotlib.pyplot as plt
 import json
 from numpy import array
 
-def plotClusterDistCopy(path, time, sizeRange=[]):
+def plotClusterDistCopy(path, times, sizeRange=[]):
     # plotting the cluster size distribution (ACO: average cluster occupancy)
     plt.subplots(figsize=(7,4))
-    df = pd.read_csv(path + '/pyStat/SteadyState_distribution.csv')
+    df = pd.read_csv(path + '/pyStat/Cluster_stat/SteadyState_distribution.csv')
     cs, foTM = df['Cluster size'], df['foTM']
-    
+    title_str = ''
+    if len(times) == 1:
+        title_str = ' ' + str(times[0])
+    else:
+        for time in times:
+            title_str = title_str + f'{str(time)}, '
+        title_str = ': ' + title_str[:-2]
+
     if len(sizeRange) == 0:
         aco = sum(cs*foTM)
         plt.bar(cs, height=foTM, fc='grey',ec='k', label=f'ACO = {aco:.2f}')
         plt.axvline(aco, ls='dashed', lw=1.5, color='k')
         plt.xlabel('Cluster Size (molecules)')
         plt.ylabel('Fraction of total molecules')
-        plt.title(f'Cluster Size Distribution at {time} s')
+        plt.title(f'Cluster Size Distribution at{title_str} s')
         plt.legend()
         plt.show()
     else:
@@ -44,7 +51,7 @@ def plotClusterDistCopy(path, time, sizeRange=[]):
             plt.bar(xLab, foTM_binned, color='grey', ec='k')
             plt.xlabel('Cluster size range (molecules)')
             plt.ylabel('Fraction of total molecules')
-            plt.title(f'Binned Cluster Size Distribution at {time} s')
+            plt.title(f'Binned Cluster Size Distribution at{title_str} s')
             plt.ylim(0,1)
             plt.show()
         except:
