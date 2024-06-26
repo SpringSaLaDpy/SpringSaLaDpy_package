@@ -3,8 +3,8 @@ requires = ["hatchling", "numpy", "pandas", "matplotlib"]
 build-backend = "hatchling.build"
 
 [project]
-name = "SpringSaLaDpy"
-version = "0.0.18"
+name = "saladpy"
+version = "0.0.20"
 authors = [
   { name="Harrison Perone", email="Harrison.perone@uconn.edu" },
 ]

@@ -321,9 +321,13 @@ class CrossLinkIndex:
                 plt.figure(figsize=(6,3))
                 plt.scatter(cs,ce,c=freq, s=50, cmap='rainbow')
                 ce_gt10 = [ce for ce,cs in zip(ce,cs) if cs > 10]
-                m_ce = sum(ce_gt10)/len(ce_gt10)
-                plt.axhline(m_ce, ls='dashed', lw=1.5, 
-                            color='k', label=f'mean = {m_ce:.3f}')
+                if ce_gt10 != []:
+                    m_ce = sum(ce_gt10)/len(ce_gt10)
+                    plt.axhline(m_ce, ls='dashed', lw=1.5, 
+                                color='k', label=f'mean = {m_ce:.3f}')
+                    plt.legend(fontsize=16)
+                else:
+                    pass
                 plt.colorbar()
                 
                 #plt.scatter(cs_arr, ce_arr, color=color, label="mean SI = {:.4f}".format(meanVal))
@@ -335,7 +339,6 @@ class CrossLinkIndex:
                     plt.yticks(ticks=yticks)
                 #plt.title(name, fontsize=16)
                 plt.title("Cluster Bound Fraction Scatter Plot" + title_str, fontsize=16)
-                plt.legend(fontsize=16)
                 plt.show()
             if hist:
                 weights = np.ones_like(ce_arr)/len(ce_arr)

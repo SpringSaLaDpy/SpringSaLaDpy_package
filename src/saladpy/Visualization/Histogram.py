@@ -3,6 +3,7 @@ from .Molclustpy_visualization_funcitons import *
 from SpringSaLaDpy.input_file_extraction import read_input_file
 from SpringSaLaDpy.time_rounder import find_nearest_time
 from SpringSaLaDpy.data_locator import *
+from .times_2_title import times_2_title
 
 def plot(search_directory, times, bins=[]):
     
@@ -27,8 +28,10 @@ def plot(search_directory, times, bins=[]):
     if times == []:
         rounded_times.append(total_time)
 
+    title_str = times_2_title(rounded_times)
+
     ca = ClusterAnalysis(input_file)
     ca.getMeanTrajectory(SingleTraj=False)
     ca.getSteadyStateDistribution(SS_timePoints=rounded_times)
 
-    plotClusterDistCopy(plotting_path, rounded_times, bins)
+    plotClusterDistCopy(plotting_path, rounded_times, bins, title_str)

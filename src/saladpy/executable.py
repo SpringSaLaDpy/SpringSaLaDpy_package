@@ -27,6 +27,8 @@ def simulate(model, runs=1):
         raw_s = r'{}'.format(model_path)
         for i in range(runs):
             subprocess.run([executable_path, 'simulate', raw_s, str(i)])
+        with open(model_path) as file:
+            file.write(f'Runs: {runs}')
         print(f'Simulation complete, results can be found here: {model_path[:-4]}_FOLDER')
 
 #simulate(r'C:\Users\cpero\Downloads\test_output\Simulation0_SIM.txt')
