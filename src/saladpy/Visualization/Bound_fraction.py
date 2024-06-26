@@ -1,9 +1,9 @@
 import numpy as np
 from .ClusterCrossLinking import CrossLinkIndex
 from .times_2_title import *
-from SpringSaLaDpy.data_locator import *
-from SpringSaLaDpy.input_file_extraction import read_input_file
-from SpringSaLaDpy.time_rounder import find_nearest_time
+from saladpy.data_locator import *
+from saladpy.input_file_extraction import read_input_file
+from saladpy.time_rounder import find_nearest_time
 
 def plot(search_directory, times, hist=False):     
     #txtfile = r"Examples\Nephrin-Nck-NWasp\Final_version_test_SIMULATIONS\Simulation0_SIM_SIMULATIONS\Simulation0_SIM_FOLDER\Simulation0_SIM.txt"

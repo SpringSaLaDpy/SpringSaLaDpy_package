@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import os
-from SpringSaLaDpy.data_locator import *
+from saladpy.data_locator import *
 from molclustpy import *
 from .Molclustpy_visualization_funcitons import *
 

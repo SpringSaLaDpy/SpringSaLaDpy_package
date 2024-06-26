@@ -1,8 +1,8 @@
 from .ssalad_ClusterAnalysis import *
 from .Molclustpy_visualization_funcitons import *
-from SpringSaLaDpy.input_file_extraction import read_input_file
-from SpringSaLaDpy.time_rounder import find_nearest_time
-from SpringSaLaDpy.data_locator import *
+from saladpy.input_file_extraction import read_input_file
+from saladpy.time_rounder import find_nearest_time
+from saladpy.data_locator import *
 from .times_2_title import times_2_title
 
 def plot(search_directory, times, bins=[]):

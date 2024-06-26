@@ -1,4 +1,4 @@
-from SpringSaLaDpy.input_file_extraction import *
+from saladpy.input_file_extraction import *
 import os
 import matplotlib.pyplot as plt
 from .ClusTopology_ss import ClusterDensity

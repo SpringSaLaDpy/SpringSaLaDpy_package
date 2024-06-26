@@ -5,7 +5,7 @@ Created on Thu Feb  7 14:19:54 2019
 @author: Ani Chattaraj
 """
 from .DrawingTool import Draw_2D_Molecule, ReadSimFile
-from SpringSaLaDpy.data_locator import find_txt_file
+from saladpy.data_locator import find_txt_file
 
 def display_molecules(path):
     

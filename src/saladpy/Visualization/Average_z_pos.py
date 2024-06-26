@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-from SpringSaLaDpy.data_locator import data_file_finder
-from SpringSaLaDpy.input_file_extraction import read_input_file
+from saladpy.data_locator import data_file_finder
+from saladpy.input_file_extraction import read_input_file
 from .Molclustpy_visualization_funcitons import plotAverageZTimeCourse
 import statistics
 import numpy as np
