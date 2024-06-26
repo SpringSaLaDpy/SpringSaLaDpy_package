@@ -20,7 +20,7 @@ def read_viewer(path):
     input_file = find_txt_file(specific_path)
     return count, dt_image, input_file
 
-def plot(path, times=[]):
+def plot(path, times=[], size_threshold=1):
     count, dt_image, input_file = read_viewer(path)
 
     if times==[]:
@@ -39,7 +39,7 @@ def plot(path, times=[]):
     title_str = times_2_title(times)
     
     cd = ClusterDensity(input_file, ss_timeSeries=times)
-    cd.getCD_stat(cs_thresh=1, title_str=title_str)
+    cd.getCD_stat(cs_thresh=size_threshold, title_str=title_str)
 
 def time_course(path, data_selection='rg', indicies = [0,1], size_threshold=1):
     count, dt_image, input_file = read_viewer(path)

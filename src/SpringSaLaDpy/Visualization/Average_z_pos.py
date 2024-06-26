@@ -262,10 +262,15 @@ def plot(directory_path, indicies=[], verbose=False, legend_right=True, list_opt
         for run in z_values_list:
             tmp_list.append(run[i])
         avg = [sum(col)/len(col) for col in zip(*tmp_list)]
-        std = [statistics.stdev(col) for col in zip(*tmp_list)]
         avg_z_values.append(avg)
-        std_z_values.append(std)
-
+        if num_runs != 1:
+            std = [statistics.stdev(col) for col in zip(*tmp_list)]
+            std_z_values.append(std)
+        else:
+            fill = False
+            std = [0 for col in zip(*tmp_list)]
+            std_z_values.append(std)
+        
     avg_arr = np.transpose(np.array(avg_z_values))
     std_arr = np.transpose(np.array(std_z_values))
 
