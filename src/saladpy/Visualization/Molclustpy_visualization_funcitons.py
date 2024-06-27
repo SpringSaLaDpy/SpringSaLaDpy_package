@@ -143,16 +143,16 @@ def plotBarGraph(xdata, yList, yLabels, title='', width=0.1, alpha=0.5):
     plt.title(title, pad=12)
     plt.show()
 
-def plotClusterCompositionCopy(path, time, specialClusters=[], width=0.1, alpha=0.6):
-    df = pd.read_csv(path + '/pyStat/Cluster_composition.csv')
+def plotClusterCompositionCopy(path, title_str, specialClusters=[], width=0.1, alpha=0.6):
+    df = pd.read_csv(path)
     csList = df['Clusters']
     if len(specialClusters) == 0:
         mols = df.columns[2:]
         freqList = [df[mol] for mol in mols]
-        plotBarGraph(csList, freqList, mols, width=width, alpha=alpha, title=f'Cluster Composition at {time} s')
+        plotBarGraph(csList, freqList, mols, width=width, alpha=alpha, title=f'Cluster Composition{title_str}')
     else:
         idx = [i for i in range(len(csList)) if csList[i] in specialClusters]
         df2 = df.iloc[idx]
         mols = df.columns[2:]
         freqList = [df2[mol] for mol in mols]
-        plotBarGraph(df2['Clusters'], freqList, mols, width=width, alpha=alpha, title=f'Cluster Composition at {time} s')
+        plotBarGraph(df2['Clusters'], freqList, mols, width=width, alpha=alpha, title=f'Cluster Composition{title_str}')

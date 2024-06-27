@@ -9,4 +9,5 @@ __all__ = ['Average_z_pos',
            'ClusterCrossLinking',
            'Bound_fraction',
            'times_2_title',
-           'ssalad_ClusterAnalysis']
+           'ssalad_ClusterAnalysis',
+           'Composition']
