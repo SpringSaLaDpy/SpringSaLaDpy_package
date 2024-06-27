@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from .ClusTopology_ss import ClusterDensity
 from .DataPy import *
 from .times_2_title import * 
+from .Format import format
 
 def read_viewer(path):
     if path[-7:] == '_FOLDER':
@@ -20,25 +21,11 @@ def read_viewer(path):
     input_file = find_txt_file(specific_path)
     return count, dt_image, input_file
 
-def plot(path, times=[], size_threshold=1):
-    count, dt_image, input_file = read_viewer(path)
-
-    if times==[]:
-        
-        #Finds all data points
-        #times = [0]
-        #for i in range(int(count) + 1):
-        #    times.append(i*dt_image)
-        #times.pop(0)
-        
-        #Finds last data point
-        times = [int(count)*dt_image]
-    else:
-        pass
-
-    title_str = times_2_title(times)
+def plot(search_directory, times=[], size_threshold=1):
     
-    cd = ClusterDensity(input_file, ss_timeSeries=times)
+    input_file, rounded_times, _, title_str = format(search_directory, times)
+
+    cd = ClusterDensity(input_file, ss_timeSeries=rounded_times)
     cd.getCD_stat(cs_thresh=size_threshold, title_str=title_str)
 
 def time_course(path, data_selection='rg', indicies = [0,1], size_threshold=1):
