@@ -5,7 +5,7 @@ from .Format import format
 
 def plot(search_directory, times, bins=[]):
     
-    input_file, rounded_times, _, title_str = format(search_directory, times)
+    input_file, rounded_times, title_str = format(search_directory, times)
 
     ca = ClusterAnalysis(input_file)
     ca.getMeanTrajectory(SingleTraj=False)

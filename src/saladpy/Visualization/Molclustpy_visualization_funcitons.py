@@ -54,14 +54,16 @@ def getColumns(txtfile):
     # name of observables in gdat file
     with open(txtfile,'r') as tf:
         lines = tf.readlines()
-    columns = lines[0].replace('#','').split()
+    lines[0] = lines[0][8:-1]
+    columns = ['Time']
+    columns.extend(lines[0].split('\t'))
     return columns
 
 def plotTimeCourseCopy(path, file_name, obsList=[]):
     # plotting the observable time course
-    txtfile = path + '/pyStat/Mean_Observable_Counts.txt'
-    mean_data = np.loadtxt(path + '/pyStat/Mean_Observable_Counts.txt')
-    std_data = np.loadtxt(path + '/pyStat/Stdev_Observable_Counts.txt')
+    txtfile = path + '/pyStat/Count_stat/Mean_Observable_Counts.txt'
+    mean_data = np.loadtxt(path + '/pyStat/Count_stat/Mean_Observable_Counts.txt')
+    std_data = np.loadtxt(path + '/pyStat/Count_stat/Stdev_Observable_Counts.txt')
     
     _, numVar = mean_data.shape
     colNames = getColumns(txtfile)
@@ -72,8 +74,8 @@ def plotTimeCourseCopy(path, file_name, obsList=[]):
             plt.fill_between(x, y-yerr, y+yerr, alpha=0.2)
     else:
         for i in obsList:
-            x, y, yerr = mean_data[:,0], mean_data[:,int(i)], std_data[:,int(i)]
-            plt.plot(x,y, label=f'{colNames[i]}')
+            x, y, yerr = mean_data[:,0], mean_data[:,int(i+1)], std_data[:,int(i+1)]
+            plt.plot(x,y, label=f'{colNames[i+1]}')
             plt.fill_between(x, y-yerr, y+yerr, alpha=0.2)
             
     plt.legend(bbox_to_anchor=(1.02, 1), loc='upper left')

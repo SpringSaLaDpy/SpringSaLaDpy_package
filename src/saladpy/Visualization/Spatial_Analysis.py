@@ -23,7 +23,7 @@ def read_viewer(path):
 
 def plot(search_directory, times=[], size_threshold=1):
     
-    input_file, rounded_times, _, title_str = format(search_directory, times)
+    input_file, rounded_times, title_str = format(search_directory, times)
 
     cd = ClusterDensity(input_file, ss_timeSeries=rounded_times)
     cd.getCD_stat(cs_thresh=size_threshold, title_str=title_str)

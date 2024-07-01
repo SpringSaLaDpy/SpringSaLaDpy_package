@@ -249,7 +249,6 @@ class ClusterAnalysis:
         
         timepoints = np.arange(0, self.t_total+self.dt, self.dt)
         if timepoints[-1] > self.t_total:
-            print(f'removed: {timepoints[-1]}, max is {self.t_total}')
             timepoints = timepoints[:-1]
         self.timePoints = timepoints
         

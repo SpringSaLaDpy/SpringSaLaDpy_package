@@ -23,19 +23,19 @@ def file_info(path, list_neighbors=False):
 
 def column_info(path=None, frame=None, start_col=0):
     if frame is None:
-        df = pd.read_csv(path, skiprows=1)
-        entries = int((df.shape[1] - 3)/2)
+        df = pd.read_csv(path)
+        entries = int((df.shape[1] - 2))
     else:
         df = frame
         entries = int(df.shape[1])
 
     print('Columns:')
     for i in range(start_col,entries+1):
-        print(f'{i}: {df.columns[i].strip()}')
+        print(f'{i-start_col}: {df.columns[i].strip()}')
 
     lines = []
-    for i in range(entries + 1):
-        lines.append(i)
+    for i in range(start_col,entries + 1):
+        lines.append(i-start_col)
 
     print('\nList of indicies:')
     print(lines)

@@ -11,4 +11,6 @@ __all__ = ['Average_z_pos',
            'times_2_title',
            'ssalad_ClusterAnalysis',
            'Composition',
-           'Format']
+           'Format',
+           'Counter',
+           'MoleculeCounter']

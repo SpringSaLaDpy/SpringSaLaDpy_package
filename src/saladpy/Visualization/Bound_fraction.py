@@ -5,9 +5,9 @@ from saladpy.data_locator import *
 from .Format import format
 
 def plot(search_directory, times, run=0, hist=False):     
-    input_file, rounded_times, plotting_path, title_str = format(search_directory, times)
+    input_file, rounded_times, title_str = format(search_directory, times)
 
-    vf = data_file_finder(plotting_path, ['viewer_files'], run = run)
+    vf = data_file_finder(search_directory, ['viewer_files'], run = run)
 
     CLI = CrossLinkIndex(input_file, ss_timeSeries=rounded_times)
 
