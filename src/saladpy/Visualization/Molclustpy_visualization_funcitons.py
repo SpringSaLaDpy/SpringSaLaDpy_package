@@ -6,7 +6,7 @@ from numpy import array
 
 def plotClusterDistCopy(path, times, sizeRange=[], title_str=''):
     # plotting the cluster size distribution (ACO: average cluster occupancy)
-    plt.subplots(figsize=(7,4))
+    fix, ax = plt.subplots(figsize=(7,4))
     df = pd.read_csv(path + '/pyStat/Cluster_stat/SteadyState_distribution.csv')
     cs, foTM = df['Cluster size'], df['foTM']
 
@@ -14,6 +14,7 @@ def plotClusterDistCopy(path, times, sizeRange=[], title_str=''):
         aco = sum(cs*foTM)
         plt.bar(cs, height=foTM, fc='grey',ec='k', label=f'ACO = {aco:.2f}')
         plt.axvline(aco, ls='dashed', lw=1.5, color='k')
+        ax.xaxis.set_major_locator(plt.MaxNLocator(integer=True, min_n_ticks=1))
         plt.xlabel('Cluster Size (molecules)')
         plt.ylabel('Fraction of total molecules')
         plt.title(f'Cluster Size Distribution{title_str}')
@@ -42,6 +43,7 @@ def plotClusterDistCopy(path, times, sizeRange=[], title_str=''):
         
         try:
             plt.bar(xLab, foTM_binned, color='grey', ec='k')
+            ax.xaxis.set_major_locator(plt.MaxNLocator(integer=True, min_n_ticks=1))
             plt.xlabel('Cluster size range (molecules)')
             plt.ylabel('Fraction of total molecules')
             plt.title(f'Binned Cluster Size Distribution{title_str}')
@@ -113,6 +115,7 @@ def plotAverageZTimeCourse(mean_data, std_data, colNames, legend_right=True, fil
 def plotBarGraph(xdata, yList, yLabels, title='', width=0.1, alpha=0.5):
     N_entry = len(yList)
     midVarId = N_entry//2
+    fix, ax = plt.subplots()
     if N_entry % 2 == 1:
         # odd number 
         plt.bar(xdata, yList[midVarId], width=width, alpha=alpha, label=yLabels[midVarId])
@@ -139,6 +142,7 @@ def plotBarGraph(xdata, yList, yLabels, title='', width=0.1, alpha=0.5):
             idx += 1
         pass
     
+    ax.xaxis.set_major_locator(plt.MaxNLocator(integer=True, min_n_ticks=1))
     plt.legend(ncol=2)
     plt.xlabel('Cluster size (molecules)')
     plt.ylabel('Frequency')

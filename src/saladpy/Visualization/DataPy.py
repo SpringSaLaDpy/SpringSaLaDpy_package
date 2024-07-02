@@ -121,6 +121,7 @@ class ReadInputFile:
             if re.search("\\b" + "Runs" + "\\b", line): # \\b : word boundary; avoids the line 'SimultaneousRuns: 1'
                 numRuns = line.split(':')[-1]
                 break
+        #numRuns = len(os.listdir(os.path.join(self.getInpath(), 'viewer_files')))
         return int(numRuns)
     
     def getReactiveSites(self):

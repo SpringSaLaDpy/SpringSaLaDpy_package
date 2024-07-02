@@ -270,6 +270,7 @@ class ClusterDensity:
         ax.scatter(csList, RgList, color='k', s=4)
         ax.set_xlabel('Cluster size (molecules)')
         ax.set_ylabel('Radius of Gyration (nm)')
+        ax.xaxis.set_major_locator(plt.MaxNLocator(integer=True, min_n_ticks=1))
         plt.title('Radius of Gyration Scatter Plot' + time_str)
         plt.show() 
     
@@ -280,6 +281,7 @@ class ClusterDensity:
         ax.bar(bonds, freq, width=0.3, color='grey')
         ax.set_xlabel('Bonds per molecule')
         ax.set_ylabel('Frequency')
+        ax.xaxis.set_major_locator(plt.MaxNLocator(integer=True, min_n_ticks=1))
         plt.title('Bonds per Molecule Histogram' + time_str)
         plt.show()
         
@@ -298,6 +300,8 @@ class ClusterDensity:
         header = 'Cluster size, Rg (nm), M1, M2'
         MCL_stat = []
         cs_tmp, rg_tmp = [], []
+
+        print(vfiles)
 
         for i, vfile in enumerate(vfiles):
             res, MCL, mtp_cs, mtp_rg, mtp_rmax = self.getClusterDensity(vfile, cs_thresh=cs_thresh)
