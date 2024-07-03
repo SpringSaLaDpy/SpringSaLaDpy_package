@@ -286,7 +286,7 @@ class ClusterDensity:
         plt.show()
         
     @displayExecutionTime
-    def getCD_stat(self, cs_thresh=1, title_str=''):
+    def getCD_stat(self, cs_thresh=1, title_str='', bonds_hist=False):
         # collect statistics at the last timepoint
         sysName = self.inpath.split('/')[-2].replace('_SIM_FOLDER','')
         print('\nSystem: ', sysName)
@@ -341,7 +341,8 @@ class ClusterDensity:
         csList = np.concatenate(cs_tmp).ravel().tolist()
         rgList = np.concatenate(rg_tmp).ravel().tolist()
         self.plotRg(csList, rgList, title_str)
-        self.plotBondsPerMolecule(counts_norm, title_str)
+        if bonds_hist:
+            self.plotBondsPerMolecule(counts_norm, title_str)
        
 '''
 files = glob('C:/Users/chatt/Desktop/pytest/springsalad/test_dataset/A5_B5_flex_3nm_2nm_count_40_SIM_FOLDER/A5_B5_flex_3nm_2nm_count_40_SIM.txt')        

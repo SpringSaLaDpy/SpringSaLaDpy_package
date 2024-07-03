@@ -65,7 +65,7 @@ def color_info(name_list):
     print('\nList of indicies:')
     print(lines)
 
-def plot(directory_path, indicies=[], verbose=False, legend_right=True, list_options=False, fill=True, mode='mol'):
+def plot(directory_path, mode='mol', indicies=[], list_options=True, verbose=False, legend_right=True, fill=True):
     molecules, _ = read_input_file(directory_path)
 
     new_path = data_file_finder(directory_path, ['viewer_files'], search_term='VIEW')

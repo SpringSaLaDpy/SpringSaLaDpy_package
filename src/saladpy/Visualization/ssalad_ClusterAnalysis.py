@@ -335,7 +335,7 @@ class ClusterAnalysis:
         else:
             outpath = simObj.getOutpath("Cluster_stat")
 
-        print(inpath)
+        print('\n' + inpath)
 
         nf = abs(Decimal(str(self.dt)).as_tuple().exponent) # Number of decimal points to format the clusterTime.csv file
 

@@ -4,7 +4,7 @@ import numpy as np
 from .Molclustpy_visualization_funcitons import *
 from saladpy.data_locator import *
 
-def composition_calc(search_directory, title_str, bins):
+def composition_calc(search_directory, title_str, special_clusters):
 
     path = data_file_finder(search_directory, ['pyStat', 'Cluster_stat'], search_term='Clusters_composition')
 
@@ -44,4 +44,4 @@ def composition_calc(search_directory, title_str, bins):
     
     df.to_csv(outpath)
 
-    plotClusterCompositionCopy(outpath, title_str, specialClusters=bins)
+    plotClusterCompositionCopy(outpath, title_str, specialClusters=special_clusters)

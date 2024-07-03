@@ -297,7 +297,7 @@ class CrossLinkIndex:
         print("CS array:", len(CS_stat))
         print("SI_array:", len(SI_stat))
     
-    def plot_SI_stat(self, scatter=True, hist=False, fs=18, color='b', xticks=None, yticks=None, title_str=''):
+    def plot_SI_stat(self, scatter=True, hist=False, fs=18, color='b', xticks=None, yticks=None, title_str='', size_threshold_mean=10):
         path = self.simObj.getInpath() + "/pyStat/SI_stat"
         simfile = self.simObj.txtfile.split('/')[-1]
         name = simfile.replace(".txt","")
@@ -320,9 +320,9 @@ class CrossLinkIndex:
                 
                 plt.figure(figsize=(6,3))
                 plt.scatter(cs,ce,c=freq, s=50, cmap='rainbow')
-                ce_gt10 = [ce for ce,cs in zip(ce,cs) if cs > 10]
-                if ce_gt10 != []:
-                    m_ce = sum(ce_gt10)/len(ce_gt10)
+                ce_gt = [ce for ce,cs in zip(ce,cs) if cs > size_threshold_mean]
+                if ce_gt != []:
+                    m_ce = sum(ce_gt)/len(ce_gt)
                     plt.axhline(m_ce, ls='dashed', lw=1.5, 
                                 color='k', label=f'mean = {m_ce:.3f}')
                     plt.legend(fontsize=16)
@@ -345,7 +345,7 @@ class CrossLinkIndex:
                 bins=int(np.sqrt(len(ce_arr)))
                 plt.hist(ce_arr, bins=20, weights=weights, color=color, label="mean SI = {:.4f}".format(meanVal))
                 plt.axvline(meanVal, ls ='dashed', lw=1, color=color)
-                plt.xlabel("SI", fontsize=fs)
+                plt.xlabel("SI (Saturation Index)", fontsize=fs)
                 plt.ylabel("Frequency", fontsize=fs)
                 #plt.title(name)
                 plt.title(f"Cluster Bound Fraction Histogram Plot" + title_str)

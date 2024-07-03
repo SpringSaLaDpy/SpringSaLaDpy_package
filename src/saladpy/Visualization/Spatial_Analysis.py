@@ -21,12 +21,12 @@ def read_viewer(path):
     input_file = find_txt_file(specific_path)
     return count, dt_image, input_file
 
-def plot(search_directory, times=[], size_threshold=1):
+def plot(search_directory, times=[], size_threshold=1, bonds_hist=False):
     
-    input_file, rounded_times, title_str = format(search_directory, times)
+    input_file, rounded_times, title_str = format(search_directory, times, file_type='viewer')
 
     cd = ClusterDensity(input_file, ss_timeSeries=rounded_times)
-    cd.getCD_stat(cs_thresh=size_threshold, title_str=title_str)
+    cd.getCD_stat(cs_thresh=size_threshold, title_str=title_str, bonds_hist=bonds_hist)
 
 def time_course(path, data_selection='rg', indicies = [0,1], size_threshold=1):
     count, dt_image, input_file = read_viewer(path)

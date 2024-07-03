@@ -61,7 +61,7 @@ def getColumns(txtfile):
     columns.extend(lines[0].split('\t'))
     return columns
 
-def plotTimeCourseCopy(path, file_name, obsList=[]):
+def plotTimeCourseCopy(path, file_name, obsList=[], legend_right=True, fill=True):
     # plotting the observable time course
     txtfile = path + '/pyStat/Count_stat/Mean_Observable_Counts.txt'
     mean_data = np.loadtxt(path + '/pyStat/Count_stat/Mean_Observable_Counts.txt')
@@ -73,14 +73,19 @@ def plotTimeCourseCopy(path, file_name, obsList=[]):
         for i in range(1, numVar):
             x, y, yerr = mean_data[:,0], mean_data[:,int(i)], std_data[:,int(i)]
             plt.plot(x,y, label=f'{colNames[i]}')
-            plt.fill_between(x, y-yerr, y+yerr, alpha=0.2)
+            if fill:
+                plt.fill_between(x, y-yerr, y+yerr, alpha=0.2)
     else:
         for i in obsList:
             x, y, yerr = mean_data[:,0], mean_data[:,int(i+1)], std_data[:,int(i+1)]
             plt.plot(x,y, label=f'{colNames[i+1]}')
-            plt.fill_between(x, y-yerr, y+yerr, alpha=0.2)
+            if fill:
+                plt.fill_between(x, y-yerr, y+yerr, alpha=0.2)
             
-    plt.legend(bbox_to_anchor=(1.02, 1), loc='upper left')
+    if not legend_right:
+        plt.legend()      
+    else:
+        plt.legend(bbox_to_anchor=(1.02, 1), loc='upper left')
     plt.xlabel('Time (seconds)')
     plt.ylabel('Observable Counts')
     plt.title(f'{file_name} with bounds of 1 SD')
