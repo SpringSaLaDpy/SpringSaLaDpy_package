@@ -341,10 +341,11 @@ class CrossLinkIndex:
                 plt.title("Cluster Bound Fraction Scatter Plot" + title_str, fontsize=16)
                 plt.show()
             if hist:
+                plt.subplots(figsize=(5,3))
                 weights = np.ones_like(ce_arr)/len(ce_arr)
                 bins=int(np.sqrt(len(ce_arr)))
                 plt.hist(ce_arr, bins=20, weights=weights, color=color, label="mean SI = {:.4f}".format(meanVal))
-                plt.axvline(meanVal, ls ='dashed', lw=1, color=color)
+                plt.axvline(meanVal, ls ='dashed', lw=1, color='k')
                 plt.xlabel("SI (Saturation Index)", fontsize=fs)
                 plt.ylabel("Frequency", fontsize=fs)
                 #plt.title(name)
