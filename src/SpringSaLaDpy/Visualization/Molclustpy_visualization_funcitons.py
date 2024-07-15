@@ -81,14 +81,18 @@ def plotTimeCourseCopy(path, file_name, obsList=[], legend_right=True, fill=True
             plt.plot(x,y, label=f'{colNames[i+1]}')
             if fill:
                 plt.fill_between(x, y-yerr, y+yerr, alpha=0.2)
-            
+
+    fill_str = ''
+    if fill:
+        fill_str = ' (bounds of 1 SD)'
+
     if not legend_right:
         plt.legend()      
     else:
         plt.legend(bbox_to_anchor=(1.02, 1), loc='upper left')
     plt.xlabel('Time (seconds)')
     plt.ylabel('Observable Counts')
-    plt.title(f'{file_name} with bounds of 1 SD')
+    plt.title(f'{file_name}{fill_str}')
     plt.show()
 
 def plotAverageZTimeCourse(mean_data, std_data, colNames, legend_right=True, fill=False, colors=[]):    
@@ -107,6 +111,10 @@ def plotAverageZTimeCourse(mean_data, std_data, colNames, legend_right=True, fil
                 plt.fill_between(x, y-yerr, y+yerr, alpha=0.2)
             else:
                 pass
+    
+    fill_str = ''
+    if fill:
+        fill_str = ' (bounds of 1 SD)'
 
     if not legend_right:
         plt.legend()      
@@ -114,10 +122,10 @@ def plotAverageZTimeCourse(mean_data, std_data, colNames, legend_right=True, fil
         plt.legend(bbox_to_anchor=(1.02, 1), loc='upper left')
     plt.xlabel('Time (seconds)')
     plt.ylabel('Distance (nm)')
-    plt.title(f'Average Distance to Membrane (bounds of 1 SD)')
+    plt.title(f'Average Distance to Membrane{fill_str}')
     plt.show()
 
-def plotBarGraph(xdata, yList, yLabels, title='', width=0.1, alpha=0.5):
+def plotBarGraph(xdata, yList, yLabels, title='', width=0.1, alpha=0.5, legend_right=False):
     N_entry = len(yList)
     midVarId = N_entry//2
     fix, ax = plt.subplots()
@@ -148,22 +156,25 @@ def plotBarGraph(xdata, yList, yLabels, title='', width=0.1, alpha=0.5):
         pass
     
     ax.xaxis.set_major_locator(plt.MaxNLocator(integer=True, min_n_ticks=1))
-    plt.legend(ncol=2)
+    if not legend_right:
+        plt.legend()      
+    else:
+        plt.legend(bbox_to_anchor=(1.02, 1), loc='upper left')
     plt.xlabel('Cluster size (molecules)')
     plt.ylabel('Frequency')
     plt.title(title, pad=12)
     plt.show()
 
-def plotClusterCompositionCopy(path, title_str, specialClusters=[], width=0.1, alpha=0.6):
+def plotClusterCompositionCopy(path, title_str, specialClusters=[], width=0.1, alpha=0.6, legend_right=True):
     df = pd.read_csv(path)
     csList = df['Clusters']
     if len(specialClusters) == 0:
         mols = df.columns[2:]
         freqList = [df[mol] for mol in mols]
-        plotBarGraph(csList, freqList, mols, width=width, alpha=alpha, title=f'Cluster Composition{title_str}')
+        plotBarGraph(csList, freqList, mols, width=width, alpha=alpha, title=f'Cluster Composition{title_str}', legend_right=legend_right)
     else:
         idx = [i for i in range(len(csList)) if csList[i] in specialClusters]
         df2 = df.iloc[idx]
         mols = df.columns[2:]
         freqList = [df2[mol] for mol in mols]
-        plotBarGraph(df2['Clusters'], freqList, mols, width=width, alpha=alpha, title=f'Cluster Composition{title_str}')
+        plotBarGraph(df2['Clusters'], freqList, mols, width=width, alpha=alpha, title=f'Cluster Composition{title_str}', legend_right=legend_right)

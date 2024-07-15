@@ -297,7 +297,7 @@ class CrossLinkIndex:
         print("CS array:", len(CS_stat))
         print("SI_array:", len(SI_stat))
     
-    def plot_SI_stat(self, scatter=True, hist=False, fs=18, color='b', xticks=None, yticks=None, title_str='', size_threshold_mean=10):
+    def plot_SI_stat(self, scatter=True, hist=False, fs=18, color='b', xticks=None, yticks=None, title_str='', size_threshold_mean=10, grouping='all'):
         path = self.simObj.getInpath() + "/pyStat/SI_stat"
         simfile = self.simObj.txtfile.split('/')[-1]
         name = simfile.replace(".txt","")
@@ -310,16 +310,27 @@ class CrossLinkIndex:
                 xy = [(x,y) for x,y in zip(cs_arr, ce_arr)]
                 freq_dict = {p: xy.count(p) for p in set(xy)}
                 tot_count = sum(freq_dict.values())
-                freq_dict = {k: (v/tot_count) for k,v in freq_dict.items()}
-                #print(freq_dict)
+                x_counts = {}
+                for x, y in xy:
+                    if x in x_counts:
+                        x_counts[x] += 1
+                    else:
+                        x_counts[x] = 1
+                cs_count = {p: x_counts[p[0]] for p in xy}
+
+                if grouping=='col':
+                    freq_dict = {k: (v/cs_count[k]) for k,v in freq_dict.items()}
+                else:
+                    freq_dict = {k: (v/tot_count) for k,v in freq_dict.items()}
                 cs,ce,freq = [], [], []
+                
                 for p,f in freq_dict.items():
                     cs.append(p[0])
                     ce.append(p[1])
                     freq.append(f)
                 
                 plt.figure(figsize=(6,3))
-                plt.scatter(cs,ce,c=freq, s=50, cmap='rainbow')
+                sc = plt.scatter(cs,ce,c=freq, s=50, cmap='rainbow')
                 ce_gt = [ce for ce,cs in zip(ce,cs) if cs > size_threshold_mean]
                 if ce_gt != []:
                     m_ce = sum(ce_gt)/len(ce_gt)
@@ -328,7 +339,8 @@ class CrossLinkIndex:
                     plt.legend(fontsize=16)
                 else:
                     pass
-                plt.colorbar()
+                cbar = plt.colorbar(sc)
+                cbar.ax.set_ylabel('Frequency')
                 
                 #plt.scatter(cs_arr, ce_arr, color=color, label="mean SI = {:.4f}".format(meanVal))
                 plt.xlabel("Cluster size (molecules)", fontsize=fs)
@@ -340,13 +352,15 @@ class CrossLinkIndex:
                 #plt.title(name, fontsize=16)
                 plt.title("Cluster Bound Fraction Scatter Plot" + title_str, fontsize=16)
                 plt.show()
-            if hist:
+            if hist and grouping=='col':
+                print('Warning, histogram hidden when grouping=\'col\'. Please switch to grouping=\'all\' if you want to see the histogram.')
+            if hist and grouping=='all':
                 plt.subplots(figsize=(5,3))
                 weights = np.ones_like(ce_arr)/len(ce_arr)
                 bins=int(np.sqrt(len(ce_arr)))
-                plt.hist(ce_arr, bins=20, weights=weights, color=color, label="mean SI = {:.4f}".format(meanVal))
+                plt.hist(ce_arr, bins=20, weights=weights, color=color, label="mean BF = {:.4f}".format(meanVal))
                 plt.axvline(meanVal, ls ='dashed', lw=1, color='k')
-                plt.xlabel("SI (Saturation Index)", fontsize=fs)
+                plt.xlabel("Bound Fraction (BF)", fontsize=fs)
                 plt.ylabel("Frequency", fontsize=fs)
                 #plt.title(name)
                 plt.title(f"Cluster Bound Fraction Histogram Plot" + title_str)

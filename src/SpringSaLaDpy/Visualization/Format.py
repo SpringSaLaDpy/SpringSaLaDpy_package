@@ -12,13 +12,13 @@ def format(search_directory, times, file_type):
     #Round to nearest available time based on dt value
     _, split_file = read_input_file(search_directory)
     if file_type == 'viewer':
-        dt = float(split_file[0][5][10:]) - 1e-12
+        dt = float(split_file[0][5][10:])
     else:
-        dt = float(split_file[0][4][9:]) - 1e-12
+        dt = float(split_file[0][4][9:])
+    dt_trimmed =  dt - 1e-12
     total_time = float(split_file[0][1][12:])
     
-    total_time = round(total_time - (total_time % dt),7)
-
+    total_time = round(total_time - (total_time % dt_trimmed),7)
     rounded_times = []
     for time in times:
         rounded_time = float(find_nearest_time(search_directory, ['data', 'Run0'], time, dt, 'Clusters_Time')[0])
@@ -28,7 +28,6 @@ def format(search_directory, times, file_type):
                 print(f'Warning, the provided time {time} has been rounded to the closest available value: {rounded_time}')
         else:
             print(f'Warning, the provided time {time} is not between 0 and the last available time: {total_time}')
-
     if rounded_times == []:
         print(f'Warning, no valid time points. Now defaulting to the last time point: {total_time}')
         rounded_times.append(total_time)

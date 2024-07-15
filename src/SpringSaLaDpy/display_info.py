@@ -37,5 +37,5 @@ def column_info(path=None, frame=None, start_col=0):
     for i in range(start_col,entries + 1):
         lines.append(i-start_col)
 
-    print('\nList of indicies:')
+    print('\nList of indices:')
     print(lines)

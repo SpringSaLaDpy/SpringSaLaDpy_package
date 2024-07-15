@@ -11,11 +11,10 @@ def find_nearest_time(search_directory, path_list, time, dt, search_term):
             time = round(time - (time % dt), 7)
 
         decimals = count_digits(dt, 7)
-
         time = format(float(time), f'.{decimals}f')
-        file = data_file_finder(search_directory, path_list, time)
+        file = data_file_finder(search_directory, path_list, search_term=time, no_warnings=True)
     else:
-        file = data_file_finder(search_directory, path_list, search_term)
+        file = data_file_finder(search_directory, path_list, search_term=search_term, no_warnings=True)
         time = float(os.path.split(file)[1].split('_')[2])
-
     return time, file
+

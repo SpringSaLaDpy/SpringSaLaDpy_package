@@ -1,8 +1,8 @@
 import os
 from .data_locator import *
 
-def read_input_file(directory_path):
-    path = find_txt_file(directory_path)
+def read_input_file(directory_path, search_term=''):
+    path = find_txt_file(directory_path, search_term)
 
     with open(path, "r") as f:
         lines = f.readlines()

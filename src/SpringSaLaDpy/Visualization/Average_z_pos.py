@@ -27,7 +27,7 @@ def site_info(colors_and_sites):
     for i in range(0, i_max + 1):
         lines.append(i)
 
-    print('\nList of indicies:')
+    print('\nList of indices:')
     print(lines)
 '''
 
@@ -39,7 +39,7 @@ def site_info(name_list):
     for i in range(0, len(name_list)):
         lines.append(i)
 
-    print('\nList of indicies:')
+    print('\nList of indices:')
     print(lines)
 
 def molecule_info(name_list):
@@ -50,7 +50,7 @@ def molecule_info(name_list):
     for i in range(0, len(name_list)):
         lines.append(i)
 
-    print('\nList of indicies:')
+    print('\nList of indices:')
     print(lines)
 
 def color_info(name_list):
@@ -62,13 +62,13 @@ def color_info(name_list):
     for i in range(0, len(name_list)):
         lines.append(i)
 
-    print('\nList of indicies:')
+    print('\nList of indices:')
     print(lines)
 
-def plot(directory_path, mode='mol', indicies=[], list_options=True, verbose=False, legend_right=True, fill=True):
+def plot(directory_path, mode='mol', indices=[], list_options=True, verbose=False, legend_right=True, fill=True):
     molecules, _ = read_input_file(directory_path)
 
-    new_path = data_file_finder(directory_path, ['viewer_files'], search_term='VIEW')
+    new_path = data_file_finder(directory_path, ['viewer_files'], search_term='VIEW_Run0')
     new_directory = os.path.split(new_path)[0]
     num_runs = len(os.listdir(new_directory))
 
@@ -83,15 +83,15 @@ def plot(directory_path, mode='mol', indicies=[], list_options=True, verbose=Fal
             if line[0:4] == 'TYPE':
                 color = line.split()[8]
                 type = line.split()[2][1:-1]
-                moleclue_name = molecule[0].split()[1][1:-1]
+                molecule_name = molecule[0].split()[1][1:-1]
                 if color not in (item[0] for item in colors_and_sites):
-                    colors_and_sites.append([color, [[moleclue_name, type]]])
-                    used_sites.append([moleclue_name, type])
-                elif [moleclue_name, type] not in used_sites:
+                    colors_and_sites.append([color, [[molecule_name, type]]])
+                    used_sites.append([molecule_name, type])
+                elif [molecule_name, type] not in used_sites:
                     for i, item in enumerate(colors_and_sites):
                         if item[0] == color:
-                            colors_and_sites[i][1].append([moleclue_name, type])
-                    used_sites.append([moleclue_name, type])
+                            colors_and_sites[i][1].append([molecule_name, type])
+                    used_sites.append([molecule_name, type])
                 else:
                     pass
     
@@ -115,31 +115,31 @@ def plot(directory_path, mode='mol', indicies=[], list_options=True, verbose=Fal
             lines = file.readlines()
         file.close()
 
-        moleclue_names = []
+        molecule_names = []
         site_names = []
 
         for key in data_dict:
-            if data_dict[key][0] not in moleclue_names:
-                moleclue_names.append(data_dict[key][0])
+            if data_dict[key][0] not in molecule_names:
+                molecule_names.append(data_dict[key][0])
 
         for key in data_dict:
             if data_dict[key] not in site_names:
                 site_names.append(data_dict[key])
 
-        if indicies == []:
+        if indices == []:
             if mode=='mol':
-                for i in range(len(moleclue_names)):
-                    indicies.append(i)
+                for i in range(len(molecule_names)):
+                    indices.append(i)
             elif mode=='site':
                 for i in range(len(site_names)):
-                    indicies.append(i)
+                    indices.append(i)
             else:
                 for i in range(len(colors_and_sites)):
-                    indicies.append(i)
+                    indices.append(i)
 
         if list_options and count == 0:
             if mode == 'mol':
-                molecule_info(moleclue_names)
+                molecule_info(molecule_names)
             elif mode == 'site':
                 site_info(site_names)
             else:
@@ -176,23 +176,23 @@ def plot(directory_path, mode='mol', indicies=[], list_options=True, verbose=Fal
         color_list_full = [x[0] for x in colors_and_sites]
         color_list = []
         if mode=='color':
-            if indicies == []:
+            if indices == []:
                 color_list = color_list_full
             else: 
-                for index in indicies:
+                for index in indices:
                     color_list.append(colors_and_sites[index][0])
         
         z_values = []
         desired_IDs = []
         legend_list = ['Time']
         if mode == 'mol':    
-            for index in indicies:
+            for index in indices:
                 current_len = len(desired_IDs)
-                desired_IDs.append([key for key, value in data_dict.items() if value[0] == moleclue_names[index]])
+                desired_IDs.append([key for key, value in data_dict.items() if value[0] == molecule_names[index]])
                 if len(desired_IDs) != current_len:
-                    legend_list.append(moleclue_names[index])
+                    legend_list.append(molecule_names[index])
         elif mode == 'site':
-            for index in indicies:
+            for index in indices:
                 current_len = len(desired_IDs)
                 desired_IDs.append([key for key, value in data_dict.items() if value[0] == site_names[index][0] and value[1] == site_names[index][1]])
                 if len(desired_IDs) != current_len:
@@ -229,7 +229,7 @@ def plot(directory_path, mode='mol', indicies=[], list_options=True, verbose=Fal
                                 legend_entry = legend_entry + f'{site[1]}, ' 
                         legend_list.append(legend_entry[:-2])
 
-        for i in range(len(indicies)):
+        for i in range(len(indices)):
             line = []
             for data_frame in data_frame_list:
                 line.append(average_Z(data_frame,desired_IDs[i]))
@@ -258,7 +258,7 @@ def plot(directory_path, mode='mol', indicies=[], list_options=True, verbose=Fal
     avg_z_values = [[float(time) for time in times]]
     std_z_values = [[float(time) for time in times]]
             
-    for i in range(len(indicies)):
+    for i in range(len(indices)):
         tmp_list = []
         for run in z_values_list:
             tmp_list.append(run[i])

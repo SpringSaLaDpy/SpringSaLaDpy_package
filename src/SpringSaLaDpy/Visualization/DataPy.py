@@ -40,7 +40,7 @@ def displayExecutionTime(func):
             print(f"Execution time : {t_min} mins {t_sec} secs")
     return wrapper
 
-def getSteadyStateIndicies(timeSeries, ss_timepoints, rel_tol=1e-8):
+def getSteadyStateIndices(timeSeries, ss_timepoints, rel_tol=1e-8):
     # both are lists of float numbers; so cant' apply equally directly
     ss_index = []
     for i, elem in enumerate(timeSeries):
@@ -581,7 +581,7 @@ class InterSiteDistance:
             
         dist_arr = np.array(dist_stat)
         mean_dist = np.mean(dist_arr, axis=0, dtype=np.float64)
-        ss_index = getSteadyStateIndicies(self.timeSeries, ss_timepoints=ss_timepoints)
+        ss_index = getSteadyStateIndices(self.timeSeries, ss_timepoints=ss_timepoints)
         SS_dist = dist_arr[:,ss_index]
         
         if writeIt:
@@ -760,7 +760,7 @@ class SingleMoleculeTracking:
             print("Calculating Radius of Gyration....")
             Rg_arr = np.array(Rg_stat)
             mean_Rg = np.mean(Rg_arr, axis=0, dtype=np.float64)
-            ss_index= getSteadyStateIndicies(self.timeSeries, ss_timepoints=ss_timepoints)
+            ss_index= getSteadyStateIndices(self.timeSeries, ss_timepoints=ss_timepoints)
             SS_Rg = Rg_arr[:,ss_index]
         
             if writeIt:

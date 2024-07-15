@@ -4,10 +4,10 @@ from .data_locator import *
 from .input_file_extraction import *
 
 
-def Describe_input_file(search_directory, links=False, reactions=False, kinetics=False):
-    molecules, split_file = read_input_file(search_directory)
+def Describe_input_file(search_directory, search_term='', links=False, reactions=False, kinetics=False):
+    molecules, split_file = read_input_file(search_directory, search_term)
 
-    print('Moleclues:\n')
+    print('Molecules:\n')
 
     #Molecule Processing
     multi_state_types = []
@@ -47,7 +47,7 @@ def Describe_input_file(search_directory, links=False, reactions=False, kinetics
             site_split2 = item[i+1].split()
             if len(site_split2) > 11:
                 multi_state_sites.append(int((i-site_types)/3) - 1)
-            site = [f'{site_split1[0]} {site_split1[1]}', site_split1[3], site_split2[2][1:-1]]
+            site = [f'{site_split1[0]} {site_split1[1]}', site_split1[3], site_split2[2][1:-1], site_split2[8]]
             site_data.append(site)
 
         #Sites (default ordering)
@@ -64,8 +64,8 @@ def Describe_input_file(search_directory, links=False, reactions=False, kinetics
         for site in site_data:
             if site[2] not in site_type_names:
                 site_type_names.append(site[2])
-                #Site type name, Numpy Array(#Intracellular, #Extracellular, #Membrane), [list of sites] 
-                sites_reordered.append([site[2], location2vec(site[1]), [site[0]]])
+                #Site type name, Numpy Array(#Intracellular, #Extracellular, #Membrane), [list of sites], color 
+                sites_reordered.append([site[2], location2vec(site[1]), [site[0]], site[3].lower().capitalize()])
             else:
                 for reordered_site in sites_reordered:
                     if site[2] == reordered_site[0]:
@@ -79,18 +79,18 @@ def Describe_input_file(search_directory, links=False, reactions=False, kinetics
             for index in location_list:
                 addStr = ''
                 if location_list[0] != 0:
-                    addStr = addStr + f'{location_list[0]} intracellular, '
+                    addStr = addStr + f'{location_list[0]} {reordered_site[3]} intracellular, '
                 if location_list[1] != 0:
-                    addStr = addStr + f'{location_list[1]} extracellular, '
+                    addStr = addStr + f'{location_list[1]} {reordered_site[3]} extracellular, '
                 if location_list[2] != 0:
-                    addStr = addStr + f'{location_list[2]} membrane, '
+                    addStr = addStr + f'{location_list[2]} {reordered_site[3]} membrane, '
             addStr2 = ''
             for index in site_list:
                 addStr2 = addStr2 + 'Site' + index[4:] + ', '
             if ',' in addStr2[:-2]:
                 print(f'Type {reordered_site[0]}: {addStr[:-2]} sites ({addStr2[:-2]})')
             else:
-                print(f'Type {reordered_site[0]}: {addStr[:-2]} ({addStr2[:-2]})')        
+                print(f'Type {reordered_site[0]}: {addStr[:-2]} site ({addStr2[:-2]})')        
         
         total_links = int(split_general_info[10])
         link_data = []

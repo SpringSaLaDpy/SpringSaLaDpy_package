@@ -28,7 +28,7 @@ def plot(search_directory, times=[], size_threshold=1, bonds_hist=False):
     cd = ClusterDensity(input_file, ss_timeSeries=rounded_times)
     cd.getCD_stat(cs_thresh=size_threshold, title_str=title_str, bonds_hist=bonds_hist)
 
-def time_course(path, data_selection='rg', indicies = [0,1], size_threshold=1):
+def time_course(path, indices = [], size_threshold=1, legend_right=True):
     count, dt_image, input_file = read_viewer(path)
 
     times = [0]
@@ -39,7 +39,9 @@ def time_course(path, data_selection='rg', indicies = [0,1], size_threshold=1):
     cd = ClusterDensity(input_file, ss_timeSeries=[times[0]])
     vfiles = glob(cd.simObj.getInpath() + "/viewer_files/*.txt")[:]
     
-    output = [[],[]]
+    outputs = []
+    for i in range(3):
+        outputs.append([[],[],[]])
 
     for time in times:
         cs_tmp, rg_tmp, rmax_tmp = [], [], []
@@ -48,7 +50,7 @@ def time_course(path, data_selection='rg', indicies = [0,1], size_threshold=1):
         for vfile in vfiles:
             #this line takes up the majority of the computation time
             res, MCL, mtp_cs, mtp_rg, mtp_rmax = cd.getClusterDensity(vfile, size_threshold)
-            
+
             cs_tmp.extend(mtp_cs)
             rg_tmp.extend(mtp_rg)
             rmax_tmp.extend(mtp_rmax)
@@ -57,41 +59,48 @@ def time_course(path, data_selection='rg', indicies = [0,1], size_threshold=1):
         rgList = np.concatenate(rg_tmp).ravel().tolist()
         rmaxList = np.concatenate(rmax_tmp).ravel().tolist()
         
-        if data_selection == 'rg':
-            plotting_list = rgList
-        elif data_selection == 'cs':
-            plotting_list = csList
-        else:
-            plotting_list = rmaxList
-        
-        if csList == []:
-            output[0].append(0)
-            output[1].append(0)
-        else:
-            output[0].append(max(plotting_list))
-            output[1].append(sum(plotting_list)/len(plotting_list))
+        plotting_lists = [rgList, csList, rmaxList]
+
+        for i, plotting_list in enumerate(plotting_lists):
+            if csList == []:
+                for j in range(3):
+                    outputs[i][j].append(0)
+            else:
+                outputs[i][0].append(min(plotting_list))
+                outputs[i][1].append(sum(plotting_list)/len(plotting_list))
+                outputs[i][2].append(max(plotting_list))
 
     plot_dict = {
-        0: 'Maximum',
-        1: 'Average'
+        0: 'Minimum',
+        1: 'Average',
+        2: 'Maximum'
     }
 
+    label_dict = {
+        0: ['Radius of Gyration', 'Radius of Gyration (nm)'],
+        1: ['Cluster Size', 'Molecules per Cluster'],
+        2: ['Maximum Cluster Radius', 'Distance (nm)']
+    }
+
+    if indices == []:
+        indices = [0,1,2]
+
     legend_list = []
-    for index in indicies:
-        legend_list.append(plot_dict[index])
-        plt.plot(times,output[index])
+    for i, output in enumerate(outputs):
+        plt.figure()
+        for index in indices:
+            legend_list.append(plot_dict[index])
+            plt.plot(times,output[index])
+            plt.title(label_dict[i][0])
+            plt.ylabel(label_dict[i][1])
+        plt.xlabel('Time (seconds)')
+        
+        if not legend_right:
+            plt.legend(legend_list)      
+        else:
+            plt.legend(legend_list, bbox_to_anchor=(1.02, 1), loc='upper left')
+        
     
-    if data_selection == 'rg':
-        plt.title('Radius of Gyration')
-        plt.ylabel('Radius of Gyration (nm)')
-    elif data_selection == 'cs':
-        plt.title('Cluster Size')
-        plt.ylabel('Moleclues per Cluster')
-    else:
-        plt.title('Maximum Cluster Radius')
-        plt.ylabel('Distance (nm)')
-    
-    plt.xlabel('Time (seconds)')
-    plt.legend(legend_list)
+
     
     

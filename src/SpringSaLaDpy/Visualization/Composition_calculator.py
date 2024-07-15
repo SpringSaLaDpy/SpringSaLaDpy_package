@@ -4,7 +4,7 @@ import numpy as np
 from .Molclustpy_visualization_funcitons import *
 from SpringSaLaDpy.data_locator import *
 
-def composition_calc(search_directory, title_str, special_clusters, width=0.1, alpha=0.6):
+def composition_calc(search_directory, title_str, special_clusters, width=0.1, alpha=0.6, legend_right=True):
 
     path = data_file_finder(search_directory, ['pyStat', 'Cluster_stat'], search_term='Clusters_composition')
 
@@ -12,9 +12,9 @@ def composition_calc(search_directory, title_str, special_clusters, width=0.1, a
         lines = file.readlines()
     file.close()
 
-    moleclues_list = ast.literal_eval(lines[0].split('\t')[1][1:-13])
+    molecules_list = ast.literal_eval(lines[0].split('\t')[1][1:-13])
     columns = ['Clusters']
-    columns.extend(moleclues_list)
+    columns.extend(molecules_list)
 
     output_lists = []
     for line in lines:
@@ -44,4 +44,4 @@ def composition_calc(search_directory, title_str, special_clusters, width=0.1, a
     
     df.to_csv(outpath)
 
-    plotClusterCompositionCopy(outpath, title_str, specialClusters=special_clusters, width=width, alpha=alpha)
+    plotClusterCompositionCopy(outpath, title_str, specialClusters=special_clusters, width=width, alpha=alpha, legend_right=legend_right)

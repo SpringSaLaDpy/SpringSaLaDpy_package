@@ -197,7 +197,7 @@ class ClusterDensity:
             d2List.append((MG.degree(n1), MG.degree(n2)))
         d1Arr = array(d1List)
         
-        # M1, M2: first and second Zagreb indicies
+        # M1, M2: first and second Zagreb indices
         M1 = sum(d1Arr**2)
         M2 = sum([d1*d2 for d1,d2 in d2List])
         
@@ -215,7 +215,7 @@ class ClusterDensity:
         MCL = []
         msm = self.mapSiteToMolecule()
         tps, index_pairs = self.getSteadyStateFrameIndices(viewerfile)
-         
+
         with open(viewerfile, 'r') as infile:
             lines = infile.readlines()
             for i,j in index_pairs:
@@ -232,9 +232,17 @@ class ClusterDensity:
                 for sg in connected_component_subgraphs(sG):
                     mLinks = [(msm[k1], msm[k2]) for k1, k2 in sg.edges()]
                     # connection between two different molecules
+                    
+                    #blacklist = ['10000', '10001', '10002', '10003', '10004', '10005', '10006', '10007']
+                    #blacklist = ['10008', '10009', '10010', '10011', '10012', '10013', '10014', '10015']
+                    
                     bonds = [(m1,m2) for m1,m2 in mLinks if m1 != m2]
-                     
+
+                    #print("Links" + str(mLinks))
+                    #print("Bond" + str(bonds))
+
                     MG = self.createMultiGraph(bonds)
+
                     # cluster size (number of molecules)
                     cs = len(MG.nodes())
                     
@@ -325,7 +333,7 @@ class ClusterDensity:
              
             ProgressBar("Progress", (i+1)/N_traj)
         
-        
+        #print(MCL_stat)
         counts_norm = {k: (MCL_stat.count(k)/len(MCL_stat)) for k in set(MCL_stat)}
         
         if cs_thresh == 1:
