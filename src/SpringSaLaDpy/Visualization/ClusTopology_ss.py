@@ -14,6 +14,8 @@ import matplotlib.pyplot as plt
 from csv import writer
 from numpy import pi, array
 from collections import defaultdict, OrderedDict, namedtuple, Counter
+import os
+from SpringSaLaDpy.data_locator import data_file_finder
 
 font = {'family' : 'Arial',
         'size'   : 16}
@@ -185,11 +187,12 @@ class ClusterDensity:
         return com, np.sqrt(Rg2), np.sqrt(rmax2)
     
     @staticmethod
-    def calc_zagreb_indices(MG):
+    def calc_zagreb_indices(MG, node_list):
         # MG: MULTI-GRAPH Object # multiple edges allowed between two nodes 
         d1List = []
         d2List = []
         nodes = list(MG.nodes())
+        specific_mol = []
         #links = [(nodes[i], nodes[j]) for i in range(len(nodes)) for j in range(len(nodes)) if i<j]
         for n in nodes:
             d1List.append(MG.degree(n))
@@ -197,14 +200,22 @@ class ClusterDensity:
             d2List.append((MG.degree(n1), MG.degree(n2)))
         d1Arr = array(d1List)
         
+        specific_nodes = [node for node in nodes if node in node_list]
+
+        for node in specific_nodes:
+            specific_mol.append(MG.degree(node))
+
         # M1, M2: first and second Zagreb indices
         M1 = sum(d1Arr**2)
         M2 = sum([d1*d2 for d1,d2 in d2List])
         
-        return M1, M2, d1Arr
+        if node_list == []:
+            specific_mol = d1Arr
+
+        return M1, M2, d1Arr, specific_mol
         
 
-    def getClusterDensity(self, viewerfile, cs_thresh=1):
+    def getClusterDensity(self, viewerfile, cs_thresh=1, molecule_list=[]):
         # cluster size,  radius of gyration
         # M1, M2: Zagreb indices
         csList, RgList, rmaxList, M1List, M2List = [], [], [], [], []
@@ -215,6 +226,25 @@ class ClusterDensity:
         MCL = []
         msm = self.mapSiteToMolecule()
         tps, index_pairs = self.getSteadyStateFrameIndices(viewerfile)
+
+        run_num = os.path.split(viewerfile)[1].split('_')[-1][3:-4]
+        search_directory = os.path.join(os.path.split(os.path.split(viewerfile)[0])[0])
+        moleclue_name_file = data_file_finder(search_directory=search_directory, path_list=['data', f'Run{run_num}'], search_term='MoleculeIDs.csv')
+        name_to_IDs = {}
+        with open(moleclue_name_file, 'r') as file:
+            lines = file.readlines()
+            for line in lines:
+                name = line.split(',')[1][:-1]
+                ID_num = line.split(',')[0]
+                if name not in name_to_IDs.keys():
+                    name_to_IDs[name] = [ID_num]
+                else:
+                    name_to_IDs[name].append(ID_num)
+
+        node_list = [] 
+        if molecule_list != []:
+            for moleclue in molecule_list:
+                node_list.extend(name_to_IDs[moleclue])
 
         with open(viewerfile, 'r') as infile:
             lines = infile.readlines()
@@ -231,24 +261,18 @@ class ClusterDensity:
                 #G.subgraph(c) for c in connected_components(G)
                 for sg in connected_component_subgraphs(sG):
                     mLinks = [(msm[k1], msm[k2]) for k1, k2 in sg.edges()]
-                    # connection between two different molecules
-                    
-                    #blacklist = ['10000', '10001', '10002', '10003', '10004', '10005', '10006', '10007']
-                    #blacklist = ['10008', '10009', '10010', '10011', '10012', '10013', '10014', '10015']
-                    
+                    # connection between two different molecules                    
                     bonds = [(m1,m2) for m1,m2 in mLinks if m1 != m2]
-
-                    #print("Links" + str(mLinks))
-                    #print("Bond" + str(bonds))
 
                     MG = self.createMultiGraph(bonds)
 
                     # cluster size (number of molecules)
                     cs = len(MG.nodes())
-                    
+
                     if cs > cs_thresh:
-                        M1, M2, dArr = self.calc_zagreb_indices(MG)
-                        MCL.extend(dArr)
+                        M1, M2, dArr, specific_mols = self.calc_zagreb_indices(MG, node_list=node_list)
+                        MCL.extend(specific_mols)
+                       
                         sites = list(sg.nodes)
                         
                         posList = np.array([posDict[s] for s in sites])
@@ -269,7 +293,6 @@ class ClusterDensity:
                 mtp_rg.append(rg_frame)
                 mtp_rmax.append(rmax_frame)
                         
-       
         return [csList, RgList, rmaxList, M1List, M2List], MCL, mtp_cs, mtp_rg, mtp_rmax
     
     @staticmethod  
@@ -294,7 +317,7 @@ class ClusterDensity:
         plt.show()
         
     @displayExecutionTime
-    def getCD_stat(self, cs_thresh=1, title_str='', bonds_hist=False):
+    def getCD_stat(self, cs_thresh=1, title_str='', bonds_hist=False, molecule_list=[]):
         # collect statistics at the last timepoint
         sysName = self.inpath.split('/')[-2].replace('_SIM_FOLDER','')
         print('\nSystem: ', sysName)
@@ -312,7 +335,7 @@ class ClusterDensity:
         print(vfiles)
 
         for i, vfile in enumerate(vfiles):
-            res, MCL, mtp_cs, mtp_rg, mtp_rmax = self.getClusterDensity(vfile, cs_thresh=cs_thresh)
+            res, MCL, mtp_cs, mtp_rg, mtp_rmax = self.getClusterDensity(vfile, cs_thresh=cs_thresh, molecule_list=molecule_list)
             #print(array(mtp_rg))
             MCL_stat.extend(MCL)
             cs_tmp.extend(mtp_cs)
@@ -333,7 +356,6 @@ class ClusterDensity:
              
             ProgressBar("Progress", (i+1)/N_traj)
         
-        #print(MCL_stat)
         counts_norm = {k: (MCL_stat.count(k)/len(MCL_stat)) for k in set(MCL_stat)}
         
         if cs_thresh == 1:
