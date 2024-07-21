@@ -10,10 +10,6 @@ from SpringSaLaDpy.data_locator import find_txt_file
 def display_molecules(path):
     
     txtfile = find_txt_file(path)
-
-    #txtfile = "Z:/Nwasp_regulation/SpringSaLaD_Models/Newer_NWASP/2nwasp_Arp23_allostericRxn_corr_SIMULATIONS/2nwasp_arp23_allosRxn_corr_SIM.txt"
-    #print(file)
-
     saveImage = False
     simfile = ReadSimFile(txtfile)
     #outpath = simfile.getOutPath()
@@ -24,7 +20,6 @@ def display_molecules(path):
     LineWidth = 0.75
 
     for mol, site, link in zip(molNames, SiteList, LinkList):
-        
         print(mol + ':')
         mol2D = Draw_2D_Molecule(mol,site,link,outpath)
         mol2D.displayMolecule(LineWidth, saveImage)

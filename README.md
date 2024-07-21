@@ -7,3 +7,7 @@ SpringSaLaDpy provides a lightweight command-line interface for the modeling and
 ## Usage
 
 Install this package by running the following command in a terminal window: pip install springsaladpy
+
+## Documentation
+
+Visit the companion demo repository (https://github.com/SpringSaLaDpy/demo) for examples and detailed explanations of every function.

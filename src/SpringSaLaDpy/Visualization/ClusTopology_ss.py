@@ -35,6 +35,7 @@ class ClusterDensity:
     def __init__(self, txtfile, ss_timeSeries):
         self.simObj = ReadInputFile(txtfile)
         tf, dt, dt_data, dt_image = self.simObj.getTimeStats()
+        self.box = self.simObj.getBoundingBox()
         self.ss_timeSeries = ss_timeSeries
         inpath = self.simObj.getInpath() + "/data"
         numRuns = self.simObj.getNumRuns()
@@ -118,16 +119,20 @@ class ClusterDensity:
     def getBindingStatus(frame):
         linkList = []
         posDict = {}
+        colorDict = {}
+        radDict = {}
         for curline in frame:
             if re.search("ID", curline):
                 line = curline.split()
                 posDict[line[1]] = [float(line[4]),float(line[5]), float(line[6])] # order = x,y,z
+                colorDict[line[1]] = line[3]
+                radDict[line[1]] = float(line[2])
                 #IdList.append(line.split()[1])
 
             if re.search("Link", curline):
                 line = curline.split()
                 linkList.append((line[1], line[3]))
-        return posDict, linkList
+        return posDict, linkList, colorDict, radDict
 
     @staticmethod
     def createGraph(IdList, LinkList):
@@ -179,12 +184,20 @@ class ClusterDensity:
         return tps, index_pairs
 
     @staticmethod
-    def calc_RadGy(posList):
-        # posList = N,3 array for N sites
-        com = np.mean(posList, axis=0) # center of mass
-        Rg2 = np.mean(np.sum((posList - com)**2, axis=1))
-        rmax2 = np.max(np.sum((posList - com)**2, axis=1), axis=0)
-        return com, np.sqrt(Rg2), np.sqrt(rmax2)
+    def calc_RadGy(posList, massList, cubic_com=True):
+        if cubic_com:
+            massList = massList.reshape(-1, 1)
+            weighted_array = posList * massList
+            weighted_sum = np.sum(weighted_array, axis=0)
+            sum_weights = np.sum(massList)
+            center = weighted_sum / sum_weights
+        else:
+            # posList = N,3 array for N sites
+            center = np.mean(posList, axis=0) # center of cluster
+        
+        Rg2 = np.mean(np.sum((posList - center)**2, axis=1))
+        rmax2 = np.max(np.sum((posList - center)**2, axis=1), axis=0)
+        return center, np.sqrt(Rg2), np.sqrt(rmax2)
     
     @staticmethod
     def calc_zagreb_indices(MG, node_list):
@@ -215,7 +228,7 @@ class ClusterDensity:
         return M1, M2, d1Arr, specific_mol
         
 
-    def getClusterDensity(self, viewerfile, cs_thresh=1, molecule_list=[]):
+    def getClusterDensity(self, viewerfile, cs_thresh=1, molecule_list=[], cubic_com=True):
         # cluster size,  radius of gyration
         # M1, M2: Zagreb indices
         csList, RgList, rmaxList, M1List, M2List = [], [], [], [], []
@@ -229,9 +242,9 @@ class ClusterDensity:
 
         run_num = os.path.split(viewerfile)[1].split('_')[-1][3:-4]
         search_directory = os.path.join(os.path.split(os.path.split(viewerfile)[0])[0])
-        moleclue_name_file = data_file_finder(search_directory=search_directory, path_list=['data', f'Run{run_num}'], search_term='MoleculeIDs.csv')
+        molecule_name_file = data_file_finder(search_directory=search_directory, path_list=['data', f'Run{run_num}'], search_term='MoleculeIDs.csv')
         name_to_IDs = {}
-        with open(moleclue_name_file, 'r') as file:
+        with open(molecule_name_file, 'r') as file:
             lines = file.readlines()
             for line in lines:
                 name = line.split(',')[1][:-1]
@@ -243,8 +256,11 @@ class ClusterDensity:
 
         node_list = [] 
         if molecule_list != []:
-            for moleclue in molecule_list:
-                node_list.extend(name_to_IDs[moleclue])
+            for molecule in molecule_list:
+                node_list.extend(name_to_IDs[molecule])
+
+        path = os.path.join(os.path.split(molecule_name_file)[0], 'molecule_links.txt')
+        open(path, 'w').close()
 
         with open(viewerfile, 'r') as infile:
             lines = infile.readlines()
@@ -252,17 +268,31 @@ class ClusterDensity:
                 #i,j = index_pairs[-1]
                 current_frame = lines[i:j]
                 cs_frame, rg_frame, rmax_frame = [], [], [] # clusters in current frame
-                posDict, Links = self.getBindingStatus(current_frame)
+                posDict, Links, _, radDict = self.getBindingStatus(current_frame)
                 Ids = [_ for _ in posDict.keys()]
                 #mIds, mLinks = [msm[k] for k in Ids], [(msm[k1], msm[k2]) for k1,k2 in Links]
                 sG = self.createGraph(Ids, Links)
                 #mG = self.createGraph(mIds, mLinks)
-                     
+                
+                with open(path, 'a') as outfile:
+                    outfile.write(f'\n\n{current_frame[0]}')
+                    outfile.write(current_frame[1])
+                outfile.close()
+
                 #G.subgraph(c) for c in connected_components(G)
+                count = 0
                 for sg in connected_component_subgraphs(sG):
                     mLinks = [(msm[k1], msm[k2]) for k1, k2 in sg.edges()]
                     # connection between two different molecules                    
                     bonds = [(m1,m2) for m1,m2 in mLinks if m1 != m2]
+                    
+                    if len(bonds) > 0:
+                        count += 1
+                        with open(path, 'a') as outfile:
+                            outfile.write(f'\nCluster {count}')
+                            for bond in bonds:
+                                outfile.write(f'\nBOND\t{bond[0]}\t:\t{bond[1]}')
+                        outfile.close()
 
                     MG = self.createMultiGraph(bonds)
 
@@ -276,8 +306,9 @@ class ClusterDensity:
                         sites = list(sg.nodes)
                         
                         posList = np.array([posDict[s] for s in sites])
+                        massList = np.array([float(radDict[s])**3 for s in sites])
                         
-                        com, Rg, rmax = self.calc_RadGy(posList)
+                        center, Rg, rmax = self.calc_RadGy(posList, massList, cubic_com=cubic_com)
                         
                         cs_frame.append(cs)
                         rg_frame.append(Rg)
@@ -306,18 +337,18 @@ class ClusterDensity:
         plt.show() 
     
     @staticmethod
-    def plotBondsPerMolecule(countDict, time_str):
+    def plotBondsPerMolecule(countDict, time_str, mol_str):
         fig, ax = plt.subplots(figsize=(5,3))
         bonds, freq = countDict.keys(), countDict.values()
         ax.bar(bonds, freq, width=0.3, color='grey')
         ax.set_xlabel('Bonds per molecule')
         ax.set_ylabel('Frequency')
         ax.xaxis.set_major_locator(plt.MaxNLocator(integer=True, min_n_ticks=1))
-        plt.title('Bonds per Molecule Histogram' + time_str)
+        plt.title(f'Bonds per Molecule{mol_str} Histogram{time_str}')
         plt.show()
         
     @displayExecutionTime
-    def getCD_stat(self, cs_thresh=1, title_str='', bonds_hist=False, molecule_list=[]):
+    def getCD_stat(self, cs_thresh=1, title_str='', hist=False, indices=[], cubic_com=True):
         # collect statistics at the last timepoint
         sysName = self.inpath.split('/')[-2].replace('_SIM_FOLDER','')
         print('\nSystem: ', sysName)
@@ -334,8 +365,23 @@ class ClusterDensity:
 
         print(vfiles)
 
+        search_directory = os.path.join(os.path.split(os.path.split(vfiles[0])[0])[0])
+        molecule_name_file = data_file_finder(search_directory=search_directory, path_list=['data', f'Run{0}'], search_term='MoleculeIDs.csv')
+        names = []
+        with open(molecule_name_file, 'r') as file:
+            lines = file.readlines()
+            for line in lines:
+                name = line.split(',')[1][:-1]
+                if name not in names:
+                    names.append(name)
+
+        molecule_list = []
+
+        for index in indices:
+            molecule_list.append(names[index])
+
         for i, vfile in enumerate(vfiles):
-            res, MCL, mtp_cs, mtp_rg, mtp_rmax = self.getClusterDensity(vfile, cs_thresh=cs_thresh, molecule_list=molecule_list)
+            res, MCL, mtp_cs, mtp_rg, mtp_rmax = self.getClusterDensity(vfile, cs_thresh=cs_thresh, molecule_list=molecule_list, cubic_com=cubic_com)
             #print(array(mtp_rg))
             MCL_stat.extend(MCL)
             cs_tmp.extend(mtp_cs)
@@ -353,9 +399,9 @@ class ClusterDensity:
                     for item in mtp_rg:
                         of.write(f'{item}')
                         of.write('\n')
-             
+            
             ProgressBar("Progress", (i+1)/N_traj)
-        
+
         counts_norm = {k: (MCL_stat.count(k)/len(MCL_stat)) for k in set(MCL_stat)}
         
         if cs_thresh == 1:
@@ -370,9 +416,28 @@ class ClusterDensity:
         
         csList = np.concatenate(cs_tmp).ravel().tolist()
         rgList = np.concatenate(rg_tmp).ravel().tolist()
-        self.plotRg(csList, rgList, title_str)
-        if bonds_hist:
-            self.plotBondsPerMolecule(counts_norm, title_str)
+        if hist:
+            print('Molecules:')
+            all_indices = []
+            for i, name in enumerate(names):
+                all_indices.append(i)
+                print(f'{i}: {name}')
+            print('\nList of Indices:')
+            print(all_indices)
+
+            add_str = ''
+            for index in indices:
+                add_str = add_str + f'{names[index]}, '
+            add_str = add_str[:-2]
+            if add_str != '':
+                mol_str = f' ({add_str})'
+            else:
+                mol_str = ''
+
+            self.plotBondsPerMolecule(counts_norm, title_str, mol_str)
+        else:
+            self.plotRg(csList, rgList, title_str)
+
        
 '''
 files = glob('C:/Users/chatt/Desktop/pytest/springsalad/test_dataset/A5_B5_flex_3nm_2nm_count_40_SIM_FOLDER/A5_B5_flex_3nm_2nm_count_40_SIM.txt')        

@@ -114,6 +114,14 @@ class ReadInputFile:
         t_image = self.StringSearch("dt_image", lines)
         return float(t_tot), float(ts), float(t_data), float(t_image)
     
+    def getBoundingBox(self):
+        lines = self.readFile()
+        x_bound = self.StringSearch("L_x", lines)
+        y_bound = self.StringSearch("L_y", lines)
+        z_bound_low = self.StringSearch("L_z_out", lines)
+        z_bound_high = self.StringSearch("L_z_in", lines)
+        return [(-1e3*float(x_bound)/2, 1e3*float(x_bound)/2), (-1e3*float(y_bound)/2, 1e3*float(y_bound)/2), (-1e3*float(z_bound_low), 1e3*float(z_bound_high))]
+    
     def getNumRuns(self):
         numRuns = 0
         lines = self.readFile()

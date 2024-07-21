@@ -128,9 +128,7 @@ class MoleculeCounter:
         
         
         molCount_arr = np.asarray(molCount)
-        #print(molCount_arr)
-        #print(tp)
-        
+
         _, numMols, _ = molConc_arr.shape # shape : numRuns, numMolecules, numTimepoints
         
         mean_molC = np.mean(molConc_arr, axis=0) # axis = 0 gives average molecular counts over multiple trajectories

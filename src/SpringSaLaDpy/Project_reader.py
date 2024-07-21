@@ -2,17 +2,29 @@ import numpy as np
 from .Reader_functions import *
 from .data_locator import *
 from .input_file_extraction import *
+from .DrawingTool import Draw_2D_Molecule, ReadSimFile
+from SpringSaLaDpy.data_locator import find_txt_file
 
 
-def Describe_input_file(search_directory, search_term='', links=False, reactions=False, kinetics=False):
+def Describe_input_file(search_directory, search_term='', links=False, reactions=False, kinetics=False, drawings=False):
     molecules, split_file = read_input_file(search_directory, search_term)
+
+    txtfile = find_txt_file(search_directory)
+    saveImage = False
+    simfile = ReadSimFile(txtfile)
+    #outpath = simfile.getOutPath()
+    outpath = ''
+    molNames, molcounts, SiteList, LinkList = simfile.getSiteStats()
+
+    #print(SiteList)
+    LineWidth = 0.75
 
     print('Molecules:\n')
 
     #Molecule Processing
     multi_state_types = []
     multi_state_sites = []
-    for item in molecules:   
+    for mol_num, item in enumerate(molecules):   
         #General Info
         typStr = ''
         split_general_info = item[0].split()
@@ -37,6 +49,12 @@ def Describe_input_file(search_directory, search_term='', links=False, reactions
             else:
                 initial_count = ''
         print(f'MOLECULE: {split_general_info[1]}{initial_count}')
+        
+        if drawings:
+            mol, site, link = tuple(zip(molNames, SiteList, LinkList))[mol_num]
+            mol2D = Draw_2D_Molecule(mol,site,link,outpath)
+            mol2D.displayMolecule(LineWidth, saveImage)
+
         print(f'This molecule has {split_general_info[6]} site types: {typStr[:-2]}')
 
         #Sites
