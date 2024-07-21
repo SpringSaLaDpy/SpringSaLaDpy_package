@@ -10,4 +10,4 @@ Install this package by running the following command in a terminal window: pip 
 
 ## Documentation
 
-Visit the companion demo repository (https://github.com/SpringSaLaDpy/demo) for examples and detailed explanations of every function.
+Visit the companion demonstration repository (https://github.com/SpringSaLaDpy/demo) for examples and detailed explanations of every function.
