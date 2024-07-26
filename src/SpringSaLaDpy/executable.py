@@ -32,4 +32,4 @@ def simulate(model, runs=1):
             file.write(f'Runs: {str(runs)}')
         print(f'Simulation complete, results can be found here: {model_path[:-4]}_FOLDER')
 
-#simulate(r'C:\Users\cpero\Downloads\test_output\Simulation0_SIM.txt')
+#simulate(r'C:\Users\cpero\Downloads\test_output\Simulation0_SIM.txt') 
