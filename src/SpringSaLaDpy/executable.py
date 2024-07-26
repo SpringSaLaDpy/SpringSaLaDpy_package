@@ -20,7 +20,7 @@ def simulate(model, runs=1):
         executable_name = 'langevin-ubuntu-latest'
         executable_extension = ''
 
-    with pkg_resources.path('saladpy', executable_name) as executable_path:
+    with pkg_resources.path('SpringSaLaDpy', executable_name) as executable_path:
         executable_path = f"{executable_path}{executable_extension}"
         model_path = os.path.abspath(model)
         print(f'Model "{model}" is running') 
