@@ -16,6 +16,7 @@ from numpy import pi, array
 from collections import defaultdict, OrderedDict, namedtuple, Counter
 import os
 from SpringSaLaDpy.data_locator import data_file_finder
+import time
 
 font = {'family' : 'Arial',
         'size'   : 16}
@@ -163,11 +164,13 @@ class ClusterDensity:
 
         return tps, frame_indices
     
-    def getSteadyStateFrameIndices(self, viewerfile):
+    def getSteadyStateFrameIndices(self, viewerfile, time_course=False):
         frame_indices = []
         ss_indices = [] 
         tps = []
         index_pairs = []
+        
+        '''
         with open(viewerfile, 'r') as tmpfile:
             lines = tmpfile.readlines()
             for i, line in enumerate(lines):
@@ -178,9 +181,33 @@ class ClusterDensity:
                     if any([np.isclose(float(tp), t) for t in self.ss_timeSeries]):
                         ss_indices.append(i)
             frame_indices.append(len(lines))
+        tmpfile.close()
+        '''
+
+        if True:
+            count = 0
+            scenes = 0
+            scene_pattern = re.compile("SCENE")
+            with open(viewerfile, 'r') as tmpfile:
+                for i, line in enumerate(tmpfile):
+                    count = i
+                    if scene_pattern.search(line):
+                        frame_indices.append(i + scenes)
+                        scenes = scenes + 1
+                        tp = next(tmpfile).split()[-1]
+                        tps.append(tp)
+                        if time_course:
+                            ss_indices.append(i + scenes - 1)
+                        else:
+                            if any(np.isclose(float(tp), t) for t in self.ss_timeSeries):
+                                ss_indices.append(i + scenes - 1) 
+                frame_indices.append(count + scenes + 1)
+            tmpfile.close()
+
         for ii, elem in enumerate(frame_indices):
             if elem in ss_indices:
                 index_pairs.append((elem, frame_indices[ii+1]))
+
         return tps, index_pairs
 
     @staticmethod
@@ -228,7 +255,7 @@ class ClusterDensity:
         return M1, M2, d1Arr, specific_mol
         
 
-    def getClusterDensity(self, viewerfile, cs_thresh=1, molecule_list=[], cubic_com=True):
+    def getClusterDensity(self, viewerfile, cs_thresh=1, molecule_list=[], cubic_com=True, time_course=False):        
         # cluster size,  radius of gyration
         # M1, M2: Zagreb indices
         csList, RgList, rmaxList, M1List, M2List = [], [], [], [], []
@@ -238,12 +265,16 @@ class ClusterDensity:
         # MCL: molecular cross linking (number of bonds per molecule)  
         MCL = []
         msm = self.mapSiteToMolecule()
-        tps, index_pairs = self.getSteadyStateFrameIndices(viewerfile)
+
+        tps, index_pairs = self.getSteadyStateFrameIndices(viewerfile, time_course=time_course)
+
+        section1 = time.time()
 
         run_num = os.path.split(viewerfile)[1].split('_')[-1][3:-4]
         search_directory = os.path.join(os.path.split(os.path.split(viewerfile)[0])[0])
         molecule_name_file = data_file_finder(search_directory=search_directory, path_list=['data', f'Run{run_num}'], search_term='MoleculeIDs.csv')
         name_to_IDs = {}
+
         with open(molecule_name_file, 'r') as file:
             lines = file.readlines()
             for line in lines:
@@ -259,8 +290,10 @@ class ClusterDensity:
             for molecule in molecule_list:
                 node_list.extend(name_to_IDs[molecule])
 
+        '''
         path = os.path.join(os.path.split(molecule_name_file)[0], 'molecule_links.txt')
         open(path, 'w').close()
+        '''
 
         with open(viewerfile, 'r') as infile:
             lines = infile.readlines()
@@ -274,10 +307,12 @@ class ClusterDensity:
                 sG = self.createGraph(Ids, Links)
                 #mG = self.createGraph(mIds, mLinks)
                 
+                '''
                 with open(path, 'a') as outfile:
                     outfile.write(f'\n\n{current_frame[0]}')
                     outfile.write(current_frame[1])
                 outfile.close()
+                '''
 
                 #G.subgraph(c) for c in connected_components(G)
                 count = 0
@@ -286,13 +321,15 @@ class ClusterDensity:
                     # connection between two different molecules                    
                     bonds = [(m1,m2) for m1,m2 in mLinks if m1 != m2]
                     
+                    '''
                     if len(bonds) > 0:
-                        count += 1
-                        with open(path, 'a') as outfile:
-                            outfile.write(f'\nCluster {count}')
-                            for bond in bonds:
-                                outfile.write(f'\nBOND\t{bond[0]}\t:\t{bond[1]}')
-                        outfile.close()
+                            count += 1
+                            with open(path, 'a') as outfile:
+                                outfile.write(f'\nCluster {count}')
+                                for bond in bonds:
+                                    outfile.write(f'\nBOND\t{bond[0]}\t:\t{bond[1]}')
+                            outfile.close()
+                    '''
 
                     MG = self.createMultiGraph(bonds)
 
@@ -323,7 +360,7 @@ class ClusterDensity:
                 mtp_cs.append(cs_frame)
                 mtp_rg.append(rg_frame)
                 mtp_rmax.append(rmax_frame)
-                        
+
         return [csList, RgList, rmaxList, M1List, M2List], MCL, mtp_cs, mtp_rg, mtp_rmax
     
     @staticmethod  
@@ -362,8 +399,6 @@ class ClusterDensity:
         header = 'Cluster size, Rg (nm), M1, M2'
         MCL_stat = []
         cs_tmp, rg_tmp = [], []
-
-        print(vfiles)
 
         search_directory = os.path.join(os.path.split(os.path.split(vfiles[0])[0])[0])
         molecule_name_file = data_file_finder(search_directory=search_directory, path_list=['data', f'Run{0}'], search_term='MoleculeIDs.csv')

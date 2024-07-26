@@ -7,6 +7,7 @@ import statistics
 import numpy as np
 import os
 import csv
+from .DataPy import ProgressBar
 
 def average_Z(df, desired_IDs):
     color_df = df[df['ID'].isin(desired_IDs)]
@@ -98,7 +99,6 @@ def plot(directory_path, mode='mol', indices=[], list_options=True, verbose=Fals
     for run_num in range(num_runs):
         path = data_file_finder(directory_path, ['viewer_files'], run = run_num)
         sites_path = data_file_finder(directory_path, ['data', f'Run{run_num}'], search_term='SiteIDs.csv')
-
         data_dict = {}
 
         with open(sites_path, mode='r') as file:
@@ -109,10 +109,6 @@ def plot(directory_path, mode='mol', indices=[], list_options=True, verbose=Fals
                 value = row[1].split()
                 value = [value[0], value[4]]
                 data_dict[key] = value
-        file.close()
-
-        with open(path, "r") as file:
-            lines = file.readlines()
         file.close()
 
         molecule_names = []
@@ -151,16 +147,18 @@ def plot(directory_path, mode='mol', indices=[], list_options=True, verbose=Fals
         times = []
         current_list = []
 
-        for line in lines:
-            if line == 'SCENE\n':
-                split_file.append(current_list)
-                current_list = []
-            if line[0:2] == 'ID':
-                current_list.append(line.strip()[3:])
-            if line[0:11] == 'SceneNumber':
-                times.append(line.split('\t')[3][:-1])
-        split_file.append(current_list)
-        _ = split_file.pop(0)
+        num_lines = sum(1 for _ in open(path))
+        with open(path, 'r') as file:
+            for i, line in enumerate(file):
+                if line == 'SCENE\n':
+                    split_file.append(current_list)
+                    current_list = []
+                if line[0:2] == 'ID':
+                    current_list.append(line.strip()[3:])
+                if line[0:11] == 'SceneNumber':
+                    times.append(line.split('\t')[3][:-1])
+            split_file.append(current_list)
+            _ = split_file.pop(0)
 
         for i, scene in enumerate(split_file):
             for j, row in enumerate(scene):
@@ -236,6 +234,9 @@ def plot(directory_path, mode='mol', indices=[], list_options=True, verbose=Fals
             z_values.append(line)
         z_values_list.append(z_values)
 
+        ProgressBar("Progress", (run_num + 1)/float(num_runs), 40)
+
+
     if mode == 'color':
         display_colors = []
         for color in color_list_full:
@@ -257,7 +258,7 @@ def plot(directory_path, mode='mol', indices=[], list_options=True, verbose=Fals
 
     avg_z_values = [[float(time) for time in times]]
     std_z_values = [[float(time) for time in times]]
-            
+    
     for i in range(len(indices)):
         tmp_list = []
         for run in z_values_list:
@@ -271,7 +272,7 @@ def plot(directory_path, mode='mol', indices=[], list_options=True, verbose=Fals
             fill = False
             std = [0 for col in zip(*tmp_list)]
             std_z_values.append(std)
-        
+
     avg_arr = np.transpose(np.array(avg_z_values))
     std_arr = np.transpose(np.array(std_z_values))
 

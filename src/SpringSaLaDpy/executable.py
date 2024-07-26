@@ -14,8 +14,10 @@ def simulate(model, runs=1):
         if platform.version().split('.')[0] == '14':
             executable_name = 'langevin-macos-14'
         else:
-            executable_name = 'langevin-macos-13'
-        executable_extension = '.app'
+            executable_name = 'langevin_x64'
+            #executable_name = 'langevin-macos-13'
+        executable_extension = ''
+        #executable_extension = '.app'
     else:
         executable_name = 'langevin-ubuntu-latest'
         executable_extension = ''
@@ -32,4 +34,4 @@ def simulate(model, runs=1):
             file.write(f'Runs: {str(runs)}')
         print(f'Simulation complete, results can be found here: {model_path[:-4]}_FOLDER')
 
-#simulate(r'C:\Users\cpero\Downloads\test_output\Simulation0_SIM.txt') 
+#simulate(r'C:\Users\cpero\Downloads\test_output\Simulation0_SIM.txt')

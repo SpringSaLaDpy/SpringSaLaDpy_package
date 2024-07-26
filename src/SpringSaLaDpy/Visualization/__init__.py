@@ -13,4 +13,6 @@ __all__ = ['Average_z_pos',
            'Composition',
            'Format',
            'Counter',
-           'MoleculeCounter']
+           'MoleculeCounter',
+           'clustering',
+           'acs_histogram']

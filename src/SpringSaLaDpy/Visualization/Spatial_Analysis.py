@@ -43,34 +43,50 @@ def time_course(path, indices = [], size_threshold=1, legend_right=True, cubic_c
         times.append(i*dt_image)
     times.pop(0)
 
-    cd = ClusterDensity(input_file, ss_timeSeries=[times[0]])
-    vfiles = glob(cd.simObj.getInpath() + "/viewer_files/*.txt")[:]
-    
+    cd = ClusterDensity(input_file, ss_timeSeries=times)
+    vfiles = glob(cd.simObj.getInpath() + "/viewer_files/*.txt")[:]    
+    cs_full, rg_full, rmax_full = [[] for _ in range(len(times))], [[] for _ in range(len(times))], [[] for _ in range(len(times))]
+    for i, vfile in enumerate(vfiles):
+        ProgressBar("Progress", (i+1)/float(len(vfiles)), 40)
+        res, MCL, mtp_cs, mtp_rg, mtp_rmax = cd.getClusterDensity(vfile, size_threshold, cubic_com=cubic_com, time_course=True)
+
+        for i in range(len(times)):
+            cs_full[i].extend(mtp_cs[i])
+            rg_full[i].extend(mtp_rg[i])
+            rmax_full[i].extend(mtp_rmax[i])
+
     outputs = []
     for i in range(4):
         outputs.append([[],[],[]])
 
-    for time in times:
-        cs_tmp, rg_tmp, rmax_tmp = [], [], []
+    for i, time in enumerate(times):
+        #cs_tmp, rg_tmp, rmax_tmp = [], [], []
         
+        #ProgressBar("Progress", i/len(times), 40)
+
+        '''
         cd = ClusterDensity(input_file, ss_timeSeries=[time])
         for vfile in vfiles:
             #this line takes up the majority of the computation time
-            res, MCL, mtp_cs, mtp_rg, mtp_rmax = cd.getClusterDensity(vfile, size_threshold, cubic_com=cubic_com)
+            res, MCL, mtp_cs, mtp_rg, mtp_rmax = cd.getClusterDensity(vfile, size_threshold, cubic_com=cubic_com, time_course=True)
 
             cs_tmp.extend(mtp_cs)
             rg_tmp.extend(mtp_rg)
             rmax_tmp.extend(mtp_rmax)
+        '''
+        cs_now = cs_full[i]
+        rg_now = rg_full[i]
+        rmax_now = rmax_full[i]
 
-        csList = np.concatenate(cs_tmp).ravel().tolist()
-        rgList = np.concatenate(rg_tmp).ravel().tolist()
-        rmaxList = np.concatenate(rmax_tmp).ravel().tolist()
-        distribution = [(rg/rmax) for rg, rmax in zip(rgList, rmaxList)]
+        #csList = np.concatenate(cs_now).ravel().tolist()
+        #rgList = np.concatenate(rg_now).ravel().tolist()
+        #rmaxList = np.concatenate(rmax_now).ravel().tolist()
+        distribution = [(rg/rmax) for rg, rmax in zip(rg_now, rmax_now)]
         
-        plotting_lists = [rgList, csList, rmaxList, distribution]
+        plotting_lists = [rg_now, cs_now, rmax_now, distribution]
 
         for i, plotting_list in enumerate(plotting_lists):
-            if csList == []:
+            if cs_now == []:
                 for j in range(3):
                     outputs[i][j].append(None)
             else:
@@ -124,6 +140,7 @@ def scatter_3d(path, run=0, times=[], view=[], site_scale=10, link_thickness=0.7
     count, dt_image, input_file = read_viewer(path)
     if times == []:
         times.append(-1)
+
     for time in times:
         if time == -1:
             time_input = []
@@ -142,7 +159,7 @@ def scatter_3d(path, run=0, times=[], view=[], site_scale=10, link_thickness=0.7
                 #i,j = index_pairs[-1]
                 current_frame = lines[i:j]
                 posDict, linkList, colorDict, radDict = cd.getBindingStatus(current_frame)
-
+        
         fig = plt.figure(figsize=(7,7))
         ax = fig.add_subplot(111, projection='3d')
 

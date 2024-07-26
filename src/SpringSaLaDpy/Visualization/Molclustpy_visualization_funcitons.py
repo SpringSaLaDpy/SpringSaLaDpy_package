@@ -4,19 +4,25 @@ import matplotlib.pyplot as plt
 import json
 from numpy import array
 
-def plotClusterDistCopy(path, times, sizeRange=[], title_str=''):
+def plotClusterDistCopy(path, times, sizeRange=[], title_str='', mode='foTM'):
     # plotting the cluster size distribution (ACO: average cluster occupancy)
     fix, ax = plt.subplots(figsize=(7,4))
     df = pd.read_csv(path + '/pyStat/Cluster_stat/SteadyState_distribution.csv')
-    cs, foTM = df['Cluster size'], df['foTM']
+    cs, height = df['Cluster size'], df[mode]
 
     if len(sizeRange) == 0:
-        aco = sum(cs*foTM)
-        plt.bar(cs, height=foTM, fc='grey',ec='k', label=f'ACO = {aco:.2f}')
-        plt.axvline(aco, ls='dashed', lw=1.5, color='k')
+        avg = sum(cs*height)
+        if mode=='foTM':
+            plt.bar(cs, height=height, fc='grey',ec='k', label=f'ACO = {avg:.2f}')
+            plt.ylabel('Fraction of total molecules') 
+        elif mode=='frequency':
+            plt.bar(cs, height=height, fc='grey',ec='k', label=f'ACS = {avg:.2f}')
+            plt.ylabel('Frequency')
+        else:
+            print('Error, must either \'foTM\' or \'frequency\' as the mode')
+        plt.axvline(avg, ls='dashed', lw=1.5, color='k')
         ax.xaxis.set_major_locator(plt.MaxNLocator(integer=True, min_n_ticks=1))
         plt.xlabel('Cluster Size (molecules)')
-        plt.ylabel('Fraction of total molecules')
         plt.title(f'Cluster Size Distribution{title_str}')
         plt.legend()
         plt.show()
@@ -38,11 +44,11 @@ def plotClusterDistCopy(path, times, sizeRange=[], title_str=''):
                 idList.append(i)
             
         
-        foTM_binned = [sum(foTM[idList[i]: idList[i+1]]) for i in range(len(idList)-1)]
-        foTM_binned.append(sum(foTM[idList[-1]:]))
+        binned = [sum(height[idList[i]: idList[i+1]]) for i in range(len(idList)-1)]
+        binned.append(sum(height[idList[-1]:]))
         
         try:
-            plt.bar(xLab, foTM_binned, color='grey', ec='k')
+            plt.bar(xLab, binned, color='grey', ec='k')
             ax.xaxis.set_major_locator(plt.MaxNLocator(integer=True, min_n_ticks=1))
             plt.xlabel('Cluster size range (molecules)')
             plt.ylabel('Fraction of total molecules')

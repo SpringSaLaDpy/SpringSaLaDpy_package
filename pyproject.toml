@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "SpringSaLaDpy"
-version = "0.1.3"
+version = "0.1.5"
 authors = [
   { name="Harrison Perone", email="Harrison.perone@uconn.edu" },
 ]

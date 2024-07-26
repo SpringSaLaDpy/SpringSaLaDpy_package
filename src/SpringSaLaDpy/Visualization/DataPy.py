@@ -19,7 +19,7 @@ import multiprocessing as mp
 
 def ProgressBar(jobName, progress, length=40):
     completionIndex = round(progress*length)
-    msg = "\r{} : [{}] {}%".format(jobName, "*"*completionIndex + "-"*(length-completionIndex), round(progress*100))
+    msg = "\r{} : [{}] {}%".format(jobName, "*"*completionIndex + "-"*(length-completionIndex), round(progress*100,2))
     if progress >= 1: msg += "\r\n"
     sys.stdout.write(msg)
     sys.stdout.flush()

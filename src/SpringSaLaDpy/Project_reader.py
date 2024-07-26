@@ -171,7 +171,7 @@ def Describe_input_file(search_directory, search_term='', links=False, reactions
     if reactions:
         transition_reactions, allosteric_reactions, binding_reactions = read_reactions(split_file)
         print('************************************************************************************************************\n')
-        print('Reaction Rules')
+        print('Reaction Rules:')
         #State Transition Reactions
         if len(transition_reactions) != 0:
             print(f'\nState Transition Reactions: {len(transition_reactions)}')
@@ -245,4 +245,7 @@ def Describe_input_file(search_directory, search_term='', links=False, reactions
                 else:
                     on_rate = off_rate = ''
                 print(f'Site {split_reaction[5]} of molecule {split_reaction[3]}{state1} can bind to site {split_reaction[11]} of {split_reaction[9]}{state2} {on_rate} {off_rate}')
+
+        if len(binding_reactions)==0 and len(allosteric_reactions)==0 and len(transition_reactions)==0:
+            print('\nNo rules defined')
 
