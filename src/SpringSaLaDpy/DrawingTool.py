@@ -87,12 +87,14 @@ class Draw_2D_Molecule:
         x_min, x_max = min(coor[:,2]), max(coor[:,2])
         #print(x_min, x_max)
         y_min = min(coor[:,1])
+        y_max = max(coor[:,1])
+        molHeight = y_max-y_min
         #print(mod_sites)
         sizes = []
         for site in self.siteList:
             coor = site.coordinates
             x = coor[2]
-            x_update = (x - x_min) + 5
+            x_update = (x - x_min)
             site.coordinates[2] = x_update
             self.draw_circle(site)
             sizes.append(site.radius)
@@ -112,7 +114,7 @@ class Draw_2D_Molecule:
         plt.xlabel('nm', fontsize=16)
         plt.ylabel('nm', fontsize=16)
         plt.tick_params(axis='x', labelsize=16)
-        plt.yticks([y_min-Largest_ball,y_min+Largest_ball])
+        plt.yticks([y_min-Largest_ball,y_max+Largest_ball], labels=[0,round(molHeight+2*Largest_ball,2)])
         #plt.xlim((0,35))
         #Axes.set_ylim((0,5))
         
