@@ -107,6 +107,13 @@ def time_course(path, indices = [], size_threshold=1, legend_right=True, cubic_c
         3: ['Mass Distribution Coefficient', 'Radius of Gyration / Radius']
     }
 
+    file_name_dict = {
+        0: 'Radius_of_Gyration.txt',
+        1: 'Cluster_Size.txt',
+        2: 'Cluster_Radius.txt',
+        3: 'Mass_Distribution.txt'
+    }
+
     if indices == []:
         indices = [0,1,2]
 
@@ -122,6 +129,15 @@ def time_course(path, indices = [], size_threshold=1, legend_right=True, cubic_c
             plt.ylabel(label_dict[i][1])
         plt.xlabel('Time (seconds)')
         
+        full_path = path + '/pyStat/3D_stat/' + file_name_dict[i]
+        with open(full_path,'w') as file:
+            file.write(f'Time\tMinimum\tAverage\tMaximum\n')
+            for i in range(len(times)):
+                file.write(f'{times[i]}\t{output[0][i]}\t{output[1][i]}\t{output[2][i]}\n')
+        file.close()
+        print(f'Wrote chart data! Output File: {full_path}')
+
+
         if legend_right:
             top_legend = plt.legend(lines, legend_list, bbox_to_anchor=(1.02, 1), loc='upper left')
         else:

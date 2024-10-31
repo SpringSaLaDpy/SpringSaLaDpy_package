@@ -11,13 +11,15 @@ def simulate(model, runs=1):
         executable_name = 'langevin-windows-latest'
         executable_extension = '.exe'
     elif os_name == 'Darwin':
-        if platform.version().split('.')[0] == '14':
-            executable_name = 'langevin-macos-14'
-        else:
-            executable_name = 'langevin_x64'
+        #if platform.version().split('.')[0] == '14':
+        #    executable_name = 'langevin-macos-14'
+        #else:
+        #    executable_name = 'langevin_x64'
             #executable_name = 'langevin-macos-13'
-        executable_extension = ''
+        #executable_extension = ''
         #executable_extension = '.app'
+        executable_name = 'langevin_x64'
+        executable_extension = ''
     else:
         executable_name = 'langevin-ubuntu-latest'
         executable_extension = ''
