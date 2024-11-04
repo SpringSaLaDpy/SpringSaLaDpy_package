@@ -47,6 +47,13 @@ def plotClusterDistCopy(path, times, sizeRange=[], title_str='', mode='foTM'):
         binned = [sum(height[idList[i]: idList[i+1]]) for i in range(len(idList)-1)]
         binned.append(sum(height[idList[-1]:]))
         
+        with open(path + '/pyStat/Cluster_stat/Binned_Size_Distribution.txt','w') as file:
+            file.write(f'Size Range\tBinned FoTM\n')
+            for i in range(len(binned)):
+                file.write(f'{xLab[i]}\t{binned[i]}\n')
+        file.close()
+        print(f'Wrote chart data! Output File: {path + '/pyStat/Cluster_stat/Binned_Size_Distribution.txt'}')
+
         try:
             plt.bar(xLab, binned, color='grey', ec='k')
             ax.xaxis.set_major_locator(plt.MaxNLocator(integer=True, min_n_ticks=1))
@@ -57,13 +64,6 @@ def plotClusterDistCopy(path, times, sizeRange=[], title_str='', mode='foTM'):
             plt.show()
         except:
             print('Invalid size range!! Maximal size range might be higher than largest cluster!')
-
-        with open(path + '/pyStat/Cluster_stat/Binned_Size_Distribution.txt','w') as file:
-            file.write(f'Size Range\tBinned FoTM\n')
-            for i in range(len(binned)):
-                file.write(f'{xLab[i]}\t{binned[i]}\n')
-        file.close()
-        print(f'Wrote chart data! Output File: {path + '/pyStat/Cluster_stat/Binned_Size_Distribution.txt'}')
 
 def getColumns(txtfile):
     # name of observables in gdat file

@@ -469,8 +469,26 @@ class ClusterDensity:
             else:
                 mol_str = ''
 
+            
+            bonds, freq = list(counts_norm.keys()), list(counts_norm.values())
+            
+            full_path  = outpath + '/histogram.txt'
+            with open(full_path,'w') as file:
+                file.write(f'Bonds per Molecule\tFrequency\n')
+                for i in range(len(bonds)):
+                    file.write(f'{bonds[i]}\t{freq[i]}\n')
+            file.close()
+            print(f'Wrote chart data! Output File: {full_path}')
             self.plotBondsPerMolecule(counts_norm, title_str, mol_str)
+
         else:
+            full_path  = outpath + '/radius_of_gyration.txt'
+            with open(full_path,'w') as file:
+                file.write(f'Cluster Size\tRaiuds of Gyration\n')
+                for i in range(len(csList)):
+                    file.write(f'{csList[i]}\t{rgList[i]}\n')
+            file.close()
+            print(f'Wrote chart data! Output File: {full_path}')
             self.plotRg(csList, rgList, title_str)
 
        

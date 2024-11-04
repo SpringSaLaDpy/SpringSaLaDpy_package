@@ -276,6 +276,22 @@ def plot(directory_path, mode='mol', indices=[], list_options=True, verbose=Fals
     avg_arr = np.transpose(np.array(avg_z_values))
     std_arr = np.transpose(np.array(std_z_values))
 
+    os.path.split(os.path.split(new_path)[0])[0]
+    
+    outpath = os.path.split(os.path.split(new_path)[0])[0] + '/pyStat/3D_stat/average_positions.txt'
+    full_output = np.concatenate((avg_arr, std_arr[:,1:]), axis=1)
+    first_line_1 = ''
+    first_line_2 = ''
+    for item in legend_list[1:]:
+        first_line_1 += (item + ' (mean)\t')
+        first_line_2 += (item + ' (std)\t')
+
+    first_line = 'Time\t' + first_line_1 + first_line_2
+
+    file.close()
+    np.savetxt(outpath, full_output, header=first_line, comments='')
+    print(f'Wrote chart data! Output File: {outpath}')
+
     plotAverageZTimeCourse(avg_arr, std_arr, legend_list, legend_right=legend_right, fill=fill, colors=color_list)
 
     #plt.figure(figsize=(8,5))

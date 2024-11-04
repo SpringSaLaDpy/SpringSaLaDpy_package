@@ -329,6 +329,14 @@ class CrossLinkIndex:
                     ce.append(p[1])
                     freq.append(f)
                 
+                full_path  = path + '/Bound_fraction.txt'
+                with open(full_path,'w') as file:
+                    file.write(f'Cluster Size\tBound Fraction\tFrequency\n')
+                    for i in range(len(cs)):
+                        file.write(f'{cs[i]}\t{ce[i]}\t{freq[i]}\n')
+                file.close()
+                print(f'Wrote chart data! Output File: {full_path}')
+
                 plt.figure(figsize=(6,3))
                 sc = plt.scatter(cs,ce,c=freq, s=50, cmap='rainbow')
                 ce_gt = [ce for ce,cs in zip(ce,cs) if cs > size_threshold_mean]
