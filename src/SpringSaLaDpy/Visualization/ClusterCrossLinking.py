@@ -373,7 +373,6 @@ class CrossLinkIndex:
                 #plt.title(name)
                 plt.title(f"Cluster Bound Fraction Histogram Plot" + title_str)
                 plt.legend()
-            
-            
+                plt.show()
         except:
             print(f"No files found inside {path}")
