@@ -52,7 +52,7 @@ def plotClusterDistCopy(path, times, sizeRange=[], title_str='', mode='foTM'):
             for i in range(len(binned)):
                 file.write(f'{xLab[i]}\t{binned[i]}\n')
         file.close()
-        print(f'Wrote chart data! Output File: {path + '/pyStat/Cluster_stat/Binned_Size_Distribution.txt'}')
+        print(f'Wrote chart data! Output File: {path}/pyStat/Cluster_stat/Binned_Size_Distribution.txt')
 
         try:
             plt.bar(xLab, binned, color='grey', ec='k')

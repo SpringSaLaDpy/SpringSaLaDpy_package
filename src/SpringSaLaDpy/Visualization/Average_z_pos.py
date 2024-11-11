@@ -279,6 +279,7 @@ def plot(directory_path, mode='mol', indices=[], list_options=True, verbose=Fals
     os.path.split(os.path.split(new_path)[0])[0]
     
     outpath = os.path.split(os.path.split(new_path)[0])[0] + '/pyStat/3D_stat/average_positions.txt'
+    os.makedirs(os.path.dirname(outpath), exist_ok=True)
     full_output = np.concatenate((avg_arr, std_arr[:,1:]), axis=1)
     first_line_1 = ''
     first_line_2 = ''

@@ -130,6 +130,7 @@ def time_course(path, indices = [], size_threshold=1, legend_right=True, cubic_c
         plt.xlabel('Time (seconds)')
         
         full_path = path + '/pyStat/3D_stat/' + file_name_dict[i]
+        os.makedirs(os.path.dirname(full_path), exist_ok=True)
         with open(full_path,'w') as file:
             file.write(f'Time\tMinimum\tAverage\tMaximum\n')
             for i in range(len(times)):
