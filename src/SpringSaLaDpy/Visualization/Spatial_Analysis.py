@@ -152,6 +152,7 @@ def time_course(path, indices = [], size_threshold=1, legend_right=True, cubic_c
                 plt.legend(handles=[shell, sphere], bbox_to_anchor=(1.02, 0), loc='lower left')
             else:
                 plt.legend(handles=[shell, sphere], loc='lower right')
+        plt.tight_layout()
         plt.show()
 
 def scatter_3d(path, run=0, times=[], view=[], site_scale=10, link_thickness=0.75, depth_fade=True):  

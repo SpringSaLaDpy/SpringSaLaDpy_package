@@ -106,6 +106,7 @@ def plotTimeCourseCopy(path, file_name, obsList=[], legend_right=True, fill=True
     plt.xlabel('Time (seconds)')
     plt.ylabel('Observable Counts')
     plt.title(f'{file_name}{fill_str}')
+    plt.tight_layout()
     plt.show()
 
 def plotAverageZTimeCourse(mean_data, std_data, colNames, legend_right=True, fill=False, colors=[]):    
@@ -136,6 +137,7 @@ def plotAverageZTimeCourse(mean_data, std_data, colNames, legend_right=True, fil
     plt.xlabel('Time (seconds)')
     plt.ylabel('Distance (nm)')
     plt.title(f'Average Distance to Membrane{fill_str}')
+    plt.tight_layout()
     plt.show()
 
 def plotBarGraph(xdata, yList, yLabels, title='', width=0.1, alpha=0.5, legend_right=False):
@@ -176,6 +178,7 @@ def plotBarGraph(xdata, yList, yLabels, title='', width=0.1, alpha=0.5, legend_r
     plt.xlabel('Cluster size (molecules)')
     plt.ylabel('Frequency')
     plt.title(title, pad=12)
+    plt.tight_layout()
     plt.show()
 
 def plotClusterCompositionCopy(path, title_str, specialClusters=[], width=0.1, alpha=0.6, legend_right=True):
